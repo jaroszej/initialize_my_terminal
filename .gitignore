@@ -1,0 +1,103 @@
+# macOS
+.DS_Store
+
+# Node.js
+node_modules/
+build/
+dist/
+.env
+.env.*
+yarn.lock
+package-lock.json
+.npm/
+.cache/
+
+# Python
+# Ignore virtual environments
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Go
+/bin/
+/pkg/
+*.exe
+*.out
+*.test
+coverage.out
+
+# React/Vite/Vue
+.vite/
+.vscode/
+.idea/
+*.log
+
+# Docker
+*.env
+.dockerignore
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+*.pid
+
+# Temporary files
+*.swp
+*~
+.tmp/
+temp/
+
+# OS generated files
+Thumbs.db
+
+# Compiled files
+*.o
+*.so
+*.class
+*.jar
+*.war
+*.ear
+
+# Kubernetes
+k8s/
+.kube/
+
+# Prometheus/Grafana/Loki
+*.db
+*.json
+
+# Ignore secrets
+secrets/
+**/.env*
+**/config.json
+
+# Dependency directories
+bower_components/
+jspm_packages/
+vendor/
+
+# Test output
+test-results/
+coverage/
+
+# Ubuntu-specific files and directories
+/var/cache/apt/
+/var/lib/apt/lists/
+/var/log/
+/tmp/
+/var/tmp/
+~/.cache/
+~/.config/
+~/.local/
+/snap/
+~/snap/
+~/.var/
+/etc/systemd/
+/var/crash/
+~/.local/share/Trash/
+~/.cache/thumbnails/
+~/.gnome/
+~/.gnome2/
+~/.gconf/
