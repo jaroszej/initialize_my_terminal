@@ -168,6 +168,7 @@ else
     echo "Oh My Zsh is already installed."
 fi
 
+# ensuring curl, git, wget are installed again in case user migrated scripts via hard storage device
 echo "Installing essential tools and utilities..."
 sudo apt install -y \
     build-essential \
