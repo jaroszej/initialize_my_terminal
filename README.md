@@ -4,7 +4,7 @@
 
 ## Development Environment Setup Scripts
 
-This repository contains scripts to automate the setup of a development environment on Linux systems.
+This repository contains scripts to automate the setup of a development environment on Linux Ubuntu systems (the way I like it).
 
 ---
 
@@ -81,7 +81,6 @@ This repository contains scripts to automate the setup of a development environm
 
 ## Overall Goal
 
-These scripts automate the setup of a **development environment** on a Linux Ubuntu system, ensuring that:
-- Zsh is installed and configured as the default shell.
+- Zsh is installed and configured as the default shell to my taste.
 - Essential development tools and utilities are installed.
-- Zsh is enhanced with plugins for improved productivity.
+- Zsh is enhanced with plugins for improved productivity (and style).
