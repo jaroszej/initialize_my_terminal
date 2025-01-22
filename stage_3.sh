@@ -8,7 +8,7 @@ echo "Checking if Zsh is installed..."
 if command -v zsh >/dev/null 2>&1; then
     echo "Zsh found: $(zsh --version)"
 else
-    echo "Error: Zsh is not installed. Please install Zsh before running this script."
+    echo "!! Error: Zsh is not installed. Please install Zsh before running this script."
     exit 1
 fi
 
@@ -17,7 +17,7 @@ echo "Checking if Zsh is the default shell..."
 if [ "$(readlink /proc/$$/exe)" = "/bin/zsh" ]; then
     echo "Zsh is the default shell."
 else
-    echo "Error: Zsh is not the default shell. Please set Zsh as the default shell and re-run this script."
+    echo "!! Error: Zsh is not the default shell. Please set Zsh as the default shell and re-run this script."
     exit 1
 fi
 

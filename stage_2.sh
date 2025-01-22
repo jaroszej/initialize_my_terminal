@@ -33,7 +33,7 @@ prompt_skip_installs() {
                     to_skip+="$num "
                     ;;
                 *)
-                    echo "Error: Invalid option: $num"
+                    echo "!! Error: Invalid option: $num"
                     invalid_input=true
                     ;;
             esac
@@ -97,7 +97,7 @@ install_nvm_node() {
         # shellcheck disable=SC1091
         . "$NVM_DIR/nvm.sh"
     else
-        echo "Error: NVM script not found. Please verify your NVM installation."
+        echo "!! Error: NVM script not found. Please verify your NVM installation."
         exit 1
     fi
 
@@ -144,13 +144,13 @@ install_homebrew() {
 ## Main logic ##
 
 echo "2" | zsh || {
-    echo "Error: Failed to configure Zsh. Please configure it manually by running zsh."
+    echo "!! Error: Failed to configure Zsh. Please configure it manually by running zsh."
     exit 1
 }
 
 # Verify .zshrc exists
 if [ ! -f "$HOME/.zshrc" ]; then
-    echo "Error: .zshrc file was not created. Please run Zsh manually to complete configuration."
+    echo "!! Error: .zshrc file was not created. Please run Zsh manually to complete configuration."
     exit 1
 fi
 
@@ -264,7 +264,7 @@ install_homebrew
 echo "Installing Homebrew sourced package(s)..."
 try_catch \
     "brew install --cask fzf playwright" \
-    "echo 'Error: Failed to install Homebrew casks.'"
+    "echo '!! Error: Failed to install Homebrew casks.'"
 
 # Directory setup
 PROJECTS_DIR="$HOME/projects"

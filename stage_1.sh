@@ -23,7 +23,7 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         *)
-            echo "Unknown option: $1"
+            echo "!! Error: Unknown option: $1"
             echo "Use -h or --help for usage."
             exit 1
             ;;
@@ -54,7 +54,7 @@ check_dependencies() {
 
         # If any dependencies failed to install, exit with an error
         if [ ${#failed_dependencies[@]} -gt 0 ]; then
-            echo "❌ Error: The following dependencies could not be installed: ${failed_dependencies[*]}"
+            echo "!! Error: The following dependencies could not be installed: ${failed_dependencies[*]}"
             echo "Please install them manually and re-run the script."
             exit 1
         fi
@@ -83,7 +83,7 @@ prompt_retry_or_exit() {
                 exit 1
                 ;;
             * )
-                echo "Invalid input. Please enter 'y' to try installing Zsh again or 'n' to exit."
+                echo "!! Error: Invalid input. Please enter 'y' to try installing Zsh again or 'n' to exit."
                 ;;
         esac
     done
@@ -112,10 +112,10 @@ zsh_path="$(which zsh)"
 
 if [ -z "$zsh_path" ]; then
     if [ "$RETRY" = true ]; then
-        echo "Error: Zsh path not found after installation. Please ensure Zsh is correctly installed and in your PATH."
+        echo "!! Error: Zsh path not found after installation. Please ensure Zsh is correctly installed and in your PATH."
         exit 1
     else
-        echo "Error: Zsh path not found. Checking again in a new bash session..."
+        echo "!! Error: Zsh path not found. Checking again in a new bash session..."
         exec bash stage_1.sh -r ${YES:+-y}
     fi
 fi
@@ -137,13 +137,13 @@ while true; do
                     echo "Updated Zsh path to: $zsh_path"
                     break
                 else
-                    echo "Error: Invalid path or Zsh is not executable at the provided location. Please try again."
+                    echo "!! Error: Invalid path or Zsh is not executable at the provided location. Please try again."
                 fi
             done
             break
             ;;
         * )
-            echo "Invalid input. Please enter 'y' for yes or 'n' for no."
+            echo "!! Error: Invalid input. Please enter 'y' for yes or 'n' for no."
             ;;
     esac
 done
@@ -159,7 +159,7 @@ chsh -s "$zsh_path"
 echo "Automating Zsh initial configuration..."
 if [ ! -f "$HOME/.zshrc" ]; then
     echo "2" | zsh || {
-        echo "Error: Failed to configure Zsh. Please configure it manually by running Zsh."
+        echo "!! Error: Failed to configure Zsh. Please configure it manually by running Zsh."
         exit 1
     }
 fi
