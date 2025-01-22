@@ -19,6 +19,20 @@ This repository contains scripts to automate the setup of a development environm
 
 ---
 
+### Note: Ensure scripts have executable permission
+
+```bash
+# navigate to scripts
+cd ./initialize_my_terminal
+
+# grant executable permissions
+chmod +x helper.sh start.sh \
+stage_1.sh stage_2.sh stage_3.sh \
+stage_1_error_handlers.sh stage_2_error_handlers.sh stage_3_error_handlers.sh
+```
+
+---
+
 ## Script Stages
 
 ### **Stage 1 (`stage_1.sh`)**:
