@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Exit on errors
 set -e
 
-# collect user args
 while [ $# -gt 0 ]; do
     case "$1" in
         -r|--retry)
@@ -90,14 +88,11 @@ prompt_retry_or_exit() {
 }
 
 ## main logic
-
-# Update and upgrade the system
 echo "Updating and upgrading system packages..."
 sudo apt update && sudo apt upgrade -y
 
 check_dependencies
 
-# Check if Zsh is already installed
 echo "Checking if Zsh is installed..."
 if command -v zsh >/dev/null 2>&1; then
     echo "Zsh is already installed: $(zsh --version)"
@@ -121,39 +116,51 @@ if [ -z "$zsh_path" ]; then
 fi
 
 # Prompt user to confirm the Zsh path
-while true; do
-    echo "Zsh detected at: $zsh_path"
-    read -r -p "Do you want to use this path? (y/n): " choice
-    case "$choice" in
-        y|Y )
-            echo "Using Zsh path: $zsh_path"
-            break
-            ;;
-        n|N )
-            while true; do
-                read -r -p "Enter the correct path to Zsh: " user_path
-                if [ -x "$user_path" ]; then
-                    zsh_path="$user_path"
-                    echo "Updated Zsh path to: $zsh_path"
-                    break
-                else
-                    echo "!! Error: Invalid path or Zsh is not executable at the provided location. Please try again."
-                fi
-            done
-            break
-            ;;
-        * )
-            echo "!! Error: Invalid input. Please enter 'y' for yes or 'n' for no."
-            ;;
-    esac
-done
+if [ "$YES" != true ]; then
+    while true; do
+        echo "Zsh detected at: $zsh_path"
+        read -r -p "Do you want to use this path? (y/n): " choice
+        case "$choice" in
+            y|Y )
+                echo "Using Zsh path: $zsh_path"
+                break
+                ;;
+            n|N )
+                while true; do
+                    read -r -p "Enter the correct path to Zsh: " user_path
+                    if [ -x "$user_path" ]; then
+                        zsh_path="$user_path"
+                        echo "Updated Zsh path to: $zsh_path"
+                        break
+                    else
+                        echo "!! Error: Invalid path or Zsh is not executable at the provided location. Please try again."
+                    fi
+                done
+                break
+                ;;
+            * )
+                echo "!! Error: Invalid input. Please enter 'y' for yes or 'n' for no."
+                ;;
+        esac
+    done
+else
+    echo "Using Zsh path: $zsh_path"
+fi
 
-export SHELL="$zsh_path"
+if [[ "$zsh_path" != "$SHELL" ]]; then
+    export SHELL="$zsh_path"
+fi
 
-echo "Setting Zsh as the default shell..."
-chsh -s "$zsh_path"
-
-## start stage_2.sh here, zsh doesn't automatically start
+current_shell=$(getent passwd "$USER" | cut -d: -f7)
+if [ "$current_shell" != "$zsh_path" ]; then
+    echo "Setting Zsh as the default shell..."
+    try_catch \
+        "chsh -s $zsh_path" \
+        "echo '!! Error: Failed to set Zsh as the default shell.\nSet it manually by running: \`chsh -s \'$zsh_path\'\` if the command \`echo $SHELL\` outputs \`/usr/bin/zsh\`'; exit 1"
+    chsh -s "$zsh_path"
+else
+    echo "Zsh is the default shell."
+fi
 
 # Automate Zsh initial configuration
 echo "Automating Zsh initial configuration..."
@@ -167,4 +174,4 @@ fi
 # Switch to Zsh and execute the second script
 echo "Stage 1 setup is complete. Switching to Zsh and continuing setup in stage_2.sh..."
 
-exec zsh stage_2.sh # will this require me to log in again?
+exec zsh stage_2.sh

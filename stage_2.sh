@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Exit on errors
 set -e
 
-# Function to prompt the user to skip installations
 prompt_skip_installs() {
     while true; do
         echo ""
@@ -52,7 +50,6 @@ prompt_skip_installs() {
     echo "$to_skip"
 }
 
-# Install Docker
 install_docker() {
     echo "Installing Docker and Docker Compose..."
     try_catch \
@@ -63,7 +60,6 @@ install_docker() {
     echo "Docker installed successfully: $(docker --version)"
 }
 
-# Install Golang
 install_golang() {
     echo "Installing Golang..."
     try_catch \
@@ -72,7 +68,6 @@ install_golang() {
     echo "Golang installed successfully: $(go version)"
 }
 
-# Install Java
 install_java() {
     echo "Installing Java..."
     try_catch \
@@ -81,7 +76,7 @@ install_java() {
     echo "Java installed successfully: $(java -version)"
 }
 
-# Install NVM and Node.js
+# Install NVM, Node.js, and pnpm
 install_nvm_node() {
     echo "Installing NVM..."
     if [ ! -d "$HOME/.nvm" ]; then
@@ -114,7 +109,6 @@ install_nvm_node() {
     echo "pnpm installed successfully: $(pnpm -v)"
 }
 
-# Install Rust
 install_rust() {
     echo "Installing Rust..."
     try_catch \
@@ -123,7 +117,6 @@ install_rust() {
     echo "Rust installed successfully: $(rustc --version)"
 }
 
-# Install Homebrew
 install_homebrew() {
     echo "Installing Homebrew..."
     try_catch \
@@ -142,12 +135,6 @@ install_homebrew() {
 }
 
 ## Main logic ##
-
-echo "2" | zsh || {
-    echo "!! Error: Failed to configure Zsh. Please configure it manually by running zsh."
-    exit 1
-}
-
 # Verify .zshrc exists
 if [ ! -f "$HOME/.zshrc" ]; then
     echo "!! Error: .zshrc file was not created. Please run Zsh manually to complete configuration."
@@ -222,7 +209,6 @@ while true; do
     fi
 done
 
-# Process skipping choices
 if [ "$skipping" = "all" ]; then
     SKIP_ALL=true
 else
@@ -297,5 +283,4 @@ for repo in "${PROJECT_REPOS[@]}"; do
     fi
 done
 
-# Final message
 echo "Stage 2 setup is complete. Configuring Zsh..."

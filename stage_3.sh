@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Exit on errors
 set -e
 
-# Check if Zsh is already installed
 echo "Checking if Zsh is installed..."
 if command -v zsh >/dev/null 2>&1; then
     echo "Zsh found: $(zsh --version)"
@@ -12,7 +10,6 @@ else
     exit 1
 fi
 
-# Check if Zsh is the default shell
 echo "Checking if Zsh is the default shell..."
 if [ "$(readlink /proc/$$/exe)" = "/bin/zsh" ]; then
     echo "Zsh is the default shell."
@@ -21,7 +18,6 @@ else
     exit 1
 fi
 
-# Install Antigen (if not already installed)
 echo "Installing Antigen..."
 if [ ! -f "$HOME/.antigen.zsh" ]; then
     try_catch \
@@ -32,7 +28,6 @@ else
     echo "Antigen is already installed."
 fi
 
-# add Antigen configuration to ~/.zshrc
 echo "Configuring Antigen in ~/.zshrc..."
 if ! grep -q "antigen.zsh" ~/.zshrc; then
     cat << 'EOF' >> ~/.zshrc
