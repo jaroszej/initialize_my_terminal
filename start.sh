@@ -56,9 +56,7 @@ run_stage() {
 }
 
 run_stage "stage_1.sh" 1
-
 run_stage "stage_2.sh" 2
-
 run_stage "stage_3.sh" 3
 
 echo ""

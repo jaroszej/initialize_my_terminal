@@ -167,6 +167,8 @@ sudo apt install -y \
     zip \
     vim \
     tmux \
+    gnupg \
+    pass \
     ffmpeg \
     neovim \
     python3-pip \
