@@ -40,28 +40,58 @@ run_stage() {
         exit 1
     fi
 
-    echo "===================================================================================="
+    echo "==| start |========================================================================="
     echo "--> Starting Stage $stage_number..."
     echo "===================================================================================="
     if ! ./"$stage_script"; then
         echo ""
+        echo "--| start.sh |----------------------------------------------------------------------"
         echo "!! Error: Stage $stage_number failed."
-        echo "--------------------------------------------------"
+        echo "------------------------------------------------------------------------------------"
         echo "Check the logs above for specific errors."
+        echo ""
+        echo "If your terminal does not natively support scroll, you can install 'tmux' or 'screen' using apt"
+        echo "  How to scroll using tmux or screen:"
+        echo "    # Enter Copy mode:"
+        echo "      - tmux: '^B' then  '['"
+        echo "      - screen: '^A' then '['"
+        echo "    # tmux Scroll:"
+        echo "      - Up/Down Arrow or Pg Up/Pg Down to scroll up or down"
+        echo "      - ^U and ^D to scroll a half page up or down"
+        echo "      - 'gg' to go to the top of the buffer"
+        echo "      - 'G' to go to the bottom of the buffer"
+        echo "    # screen Scroll:"
+        echo "      - Up/Down Arrow or Pg Up/Pg Down to scroll up or down"
+        echo "      - ^U and ^D to scroll a half page up or down"
+        echo ""
         echo "Refer to the error handler in $stage_script for resolution steps."
-        echo "--------------------------------------------------"
-        echo "Exiting script. Please resolve the issue and re-run."
+        echo "------------------------------------------------------------------------------------"
+        echo "Exiting initialize_my_terminal. Please resolve the issue and re-run."
         exit 1
     fi
 }
 
+echo "==| start |========================================================================="
+echo " Stage: 0/3"
+echo "===================================================================================="
 run_stage "stage_1.sh" 1
+
+echo "==| start |========================================================================="
+echo " Stage: 1/3"
+echo "===================================================================================="
 run_stage "stage_2.sh" 2
+
+echo "==| start |========================================================================="
+echo " Stage: 2/3"
+echo "===================================================================================="
 run_stage "stage_3.sh" 3
 
 echo ""
+echo "==| start |========================================================================="
+echo " Stage: 3/3"
 echo "===================================================================================="
+echo ""
 echo "OK: All stages completed successfully! Your environment is now set up."
-echo "You may need to restart your terminal or run 'source ~/.zshrc' to apply changes."
+echo "NOTE: You may need to restart your terminal or run 'source ~/.zshrc' to apply changes."
 echo "===================================================================================="
 echo ""

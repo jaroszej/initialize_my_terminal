@@ -29,7 +29,7 @@ while [ $# -gt 0 ]; do
 done
 
 check_dependencies() {
-    local dependencies=("curl" "git" "wget")
+    local dependencies=("curl" "git" "wget" "tmux")
     local missing_dependencies=()
     local failed_dependencies=()
 
