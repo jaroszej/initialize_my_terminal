@@ -93,7 +93,7 @@ install_rust() {
     RUST_ENV_FILE="$HOME/.cargo/env"
     if [ -f "$RUST_ENV_FILE" ]; then
         # shellcheck disable=SC1091
-        source . "$RUST_ENV_FILE"
+        source "$RUST_ENV_FILE"
         echo "Rust installed successfully: $(rustc --version)"
     else
         echo "NOTE: Rust installed, but $RUST_ENV_FILE not found."
