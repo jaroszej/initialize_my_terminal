@@ -2,43 +2,27 @@
 
 set -e
 
-prompt_skip_installs() {
-
+installs_textwall() {
     echo ""
+    echo "Press 'c' to continue and install all components, or enter numbers to skip specific installations (e.g., '1 3 5')."
+    echo ""
+    echo "Options:"
     echo "[1] Docker and Docker Compose"
     echo "[2] Golang"
     echo "[3] Java"
     echo "[4] NVM and the latest Node.js LTS version"
     echo "[5] Rust"
-    echo "[0] Skip all"
-
+    echo "[0] Skip all installations"
     echo ""
-    echo "If you want to skip any of these, enter the corresponding number(s)."
-    echo "You can enter multiple numbers separated by spaces (e.g., 1 3 5 to skip Docker, Java, and Rust)."
-    echo "Press Enter to continue and install all."
+}
 
-    initial_run=true
+prompt_skip_installs() {
     while true; do
-        if [ ! $initial_run ]; then
-            echo ""
-            echo "[1] Docker and Docker Compose"
-            echo "[2] Golang"
-            echo "[3] Java"
-            echo "[4] NVM and the latest Node.js LTS version"
-            echo "[5] Rust"
-            echo "[0] Skip all"
-
-            echo ""
-            echo "If you want to skip any of these, enter the corresponding number(s)."
-            echo "You can enter multiple numbers separated by spaces (e.g., 1 3 5 to skip Docker, Java, and Rust)."
-            echo "Press Enter to continue and install all."
-        fi
-        initial_run=false
-
+        installs_textwall
         read -r skip_tools
-        
-        if [ -z "$skip_tools" ]; then
-            to_skip=""
+
+        if [[ "$skip_tools" =~ ^[cC]$ ]]; then
+            to_skip="c"
             break
         fi
 
@@ -204,11 +188,12 @@ sudo apt install -y \
 
 echo "Updating and upgrading system packages..."
 sudo apt update && sudo apt upgrade -y
+echo "apt updated and upgraded"
 
-echo "Preparing to install the following: "
+installs_textwall
 skipping=$(prompt_skip_installs)
 
-if [ -z "$skipping" ]; then
+if [ "$skipping" = "c" ]; then
     echo "Installing all components."
 else
     while true; do
