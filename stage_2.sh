@@ -125,8 +125,10 @@ install_homebrew() {
     }
 
     echo "Installing Homebrew..."
-    retry_wrapper "NONINTERACTIVE=1 /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" \
-        "echo '!! Error: Homebrew installation failed.'"
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || {
+        echo "!! Error: Homebrew installation failed."
+        exit 1
+    }
 
     echo "Configuring Homebrew environment..."
     {
@@ -135,8 +137,10 @@ install_homebrew() {
 
     refresh_shell
 
-    try_catch "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" \
-        "echo '!! Error: Failed to initialize Homebrew shell environment.'"
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" || {
+        echo "!! Error: Failed to initialize Homebrew shell environment."
+        exit 1
+    }
 }
 
 while [ $# -gt 0 ]; do # parse command line args 
