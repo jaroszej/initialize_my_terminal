@@ -104,8 +104,6 @@ install_rust() {
 }
 
 install_homebrew() {
-    echo "Installing Homebrew..."
-
     if command -v brew >/dev/null 2>&1; then
         echo "Homebrew is already installed: $(brew --version)"
         return 0
@@ -113,14 +111,16 @@ install_homebrew() {
 
     echo "Installing required dependencies for Homebrew..."
     sudo apt-get update
-    sudo apt-get install -y build-essential procps file || {
+    sudo apt-get install -y build-essential procps curl file git || {
         echo "!! Error: Failed to install dependencies for Homebrew."
         exit 1
     }
 
-    retry_wrapper "
-        /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"
-    " "echo '!! Error: Homebrew installation failed.'" "$stagename"
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || {
+        echo "!! Error: Homebrew installation failed."
+        exit 1
+    }
 
     if ! command -v brew >/dev/null 2>&1; then
         echo "!! Error: Homebrew installation failed or brew command not found."
@@ -128,20 +128,16 @@ install_homebrew() {
     fi
 
     echo "Homebrew installed successfully: $(brew --version)"
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
     cat << EOF >> ~/.zshrc
 
 # Homebrew
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
 EOF
-    echo ""
 
-    # shellcheck disable=SC1090
-    source "$ZSH_CONFIG"
+    source ~/.zshrc
 }
-
-
 
 while [ $# -gt 0 ]; do # parse command line args 
     case "$1" in
