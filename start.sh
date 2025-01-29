@@ -92,17 +92,14 @@ warn_enable_scroll() {
             echo ""
             echo "If your terminal does not natively support scroll, you can install 'tmux', 'screen', or another tool using apt to scroll through old outputs."
             echo ""
-            while true; do
-                echo "Press 'Enter' to continue without using tmux or screen to scroll"
-                echo "Press 'Q' to quit and close the script..."
-                read -r response
-                if [[ "$response" =~ ^[Qq]$ ]]; then
-                    echo "Exiting initialize_my_terminal..."
-                    exit 0
-                fi
+            echo "Press 'Enter' to continue without using tmux or screen to scroll"
+            echo "Press 'Q' to quit and close the script..."
+            read -r response
+            case "$response" in
+                [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
+                *) break ;; # continue to stages
+            esac
 
-                break # continue to stages
-            done
         elif [ ${#installed[@]} -eq 1 ]; then
             while true; do
                 echo "Found ${installed[0]} installed."
@@ -111,6 +108,14 @@ warn_enable_scroll() {
                 echo "Enter 'C' to continue without ${installed[0]}"
                 echo "Enter 'Q' to quit and close the script"
                 read -r response
+                case "$response" in
+                    [Cc]) echo "Continuing without ${installed[0]}." ;;
+                    [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
+                    *) enter_scroll "${installed[0]}" ;;
+                esac
+
+
+
                 if [[ "$response" =~ ^[Cc]$ ]]; then
                     echo "Continuing without ${installed[0]}."
                 elif [[ "$response" =~ ^[Qq]$ ]]; then
@@ -130,18 +135,12 @@ warn_enable_scroll() {
                 echo "Enter 'Q' to quit and close the script"
                 read -r choice
                 choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
-                if [[ "$choice" == ^[Tt] ]]; then
-                    enter_scroll "tmux"
-                    break
-                elif [[ "$choice" == ^[Ss] ]]; then
-                    enter_scroll "screen"
-                    break
-                elif [[ "$choice" == "q" ]]; then
-                    echo "Exiting script. Goodbye!"
-                    exit 0
-                else
-                    echo "!! Error: Invalid input. Please enter 'T', 'S', or 'Q'."
-                fi
+                case "$choice" in
+                    t) enter_scroll "${installed[0]}" ;;
+                    s) enter_scroll "${installed[1]}" ;;
+                    q) echo "Exiting initialize_my_terminal..."; exit 0 ;;
+                    *) echo "Invalid choice. Please enter 'T', 'S', or 'Q'" ;;
+                esac
             done
         fi
     done
