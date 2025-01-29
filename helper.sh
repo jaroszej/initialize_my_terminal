@@ -162,7 +162,7 @@ make_scroll_temp_file() {
 
 make_stage_temp_file() {
     local stage_number=$1
-    local stage_temp_file="$scroll_temp_dir/stage_${stage_number}.temp"
+    local stage_temp_file="$temp_dir/stage_${stage_number}.temp"
 
     if [ ! -f "$stage_temp_file" ]; then
         touch "$stage_temp_file"
@@ -192,7 +192,7 @@ clear_scroll_temp_file() {
 
 clear_stage_temp_files() {
     for stage in {1..3}; do
-        local stage_temp_file="$scroll_temp_dir/stage_${stage}.temp"
+        local stage_temp_file="$temp_dir/stage_${stage}.temp"
         if [ -f "$stage_temp_file" ]; then
             rm "$stage_temp_file"
             echo "Removed stage $stage temp file."
@@ -211,7 +211,7 @@ clear_zsh_setup_temp_file() {
 
 check_stage_temp_file() {
     local stage_number=$1
-    local stage_temp_file="$scroll_temp_dir/stage_${stage_number}.temp"
+    local stage_temp_file="$temp_dir/stage_${stage_number}.temp"
 
     [ -f "$stage_temp_file" ]
 }
