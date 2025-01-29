@@ -178,4 +178,4 @@ fi
 echo ""
 echo "Stage 1 setup is complete. Switching to Zsh and continuing setup in stage_2.sh..."
 
-exec zsh stage_2.sh
+exit 0

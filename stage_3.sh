@@ -93,3 +93,5 @@ echo "and"
 echo "pass init <gpg-key-id>"
 echo "pass git init"
 echo "If you are on WSL you may need to reassign the wayland-0 socket path"
+
+exit 0

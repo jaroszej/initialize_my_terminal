@@ -63,8 +63,13 @@ for i in {1..3}; do
     else
         num=$(("$i" - 1))
         start_wrapper " Stage: $num/3"
-        run_stage "$i"
-        make_stage_temp_file "$i"
+
+        if run_stage "$i"; then    
+            make_stage_temp_file "$stage_number"
+        else
+            start_wrapper "!! Error: Unexpected failure. You may need to remove temp files in /tmp/initialize_my_terminal/ to restart from scratch."
+            exit 1
+        fi
     fi
 done
 
