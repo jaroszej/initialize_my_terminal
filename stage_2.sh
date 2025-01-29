@@ -41,18 +41,21 @@ install_docker() {
     sudo systemctl start docker
     sudo systemctl enable docker
     echo "Docker installed successfully: $(docker --version)"
+    echo ""
 }
 
 install_golang() {
     echo "Installing Golang..."
     retry_wrapper "sudo apt update && sudo apt install -y golang" "handle_golang_error"
     echo "Golang installed successfully: $(go version)"
+    echo ""
 }
 
 install_java() {
     echo "Installing Java..."
     retry_wrapper "sudo apt update && sudo apt install -y openjdk-17-jdk" "handle_java_error"
     echo "Java installed successfully: $(java -version)"
+    echo ""
 }
 
 # Install NVM, Node.js, and pnpm
@@ -80,24 +83,42 @@ install_nvm_node() {
     echo "Installing pnpm..."
     retry_wrapper "npm install -g pnpm" "handle_pnpm_error"
     echo "pnpm installed successfully: $(pnpm -v)"
+    echo ""
 }
 
 install_rust() {
     echo "Installing Rust..."
     retry_wrapper "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "handle_rust_error"
+    # shellcheck disable=SC1091
+    source "$HOME/cargo/env"
     echo "Rust installed successfully: $(rustc --version)"
+    echo ""
 }
 
 install_homebrew() {
     echo "Installing Homebrew..."
-    retry_wrapper "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" "handle_homebrew_error"
+
+    if command -v brew >/dev/null 2>&1; then
+        echo "Homebrew is already installed: $(brew --version)"
+        return 0
+    fi
+
+    retry_wrapper "
+        /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" </dev/null
+    " "echo '!! Error: Homebrew installation failed.'" "$stagename"
+
+    if ! command -v brew >/dev/null 2>&1; then
+        echo "!! Error: Homebrew installation failed or brew command not found."
+        exit 1
+    fi
+
     echo "Homebrew installed successfully: $(brew --version)"
 
     # Add Homebrew to the shell environment
-    echo >> "$ZSH_CONFIG"
-    echo "# Homebrew" >> "$ZSH_CONFIG"
-    echo "eval '$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)'" >> ~/.zshrc
-    eval '$(/opt/homebrew/bin/brew shellenv)'
+    echo -e "\n# Homebrew" >> "$ZSH_CONFIG"
+    echo "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> "$ZSH_CONFIG"
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    echo ""
 
     # shellcheck disable=SC1090
     source "$ZSH_CONFIG"
