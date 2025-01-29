@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+scroll_temp_dir="/tmp/initialize_my_terminal"
+mkdir -p "$scroll_temp_dir"
+scroll_temp_file="$scroll_temp_dir/scroll_avail.temp"
+
 try_catch() {
     local try_command=$1
     local catch_command=$2
@@ -31,4 +36,132 @@ try_catch_finally() {
     fi
 
     $finally_command
+}
+
+check_for_scroll_tool() {
+    local installed=()
+    if which tmux >/dev/null 2>&1; then
+        installed+=("tmux")
+    fi
+    if which screen >/dev/null 2>&1; then
+        installed+=("screen")
+    fi
+    echo "${installed[@]}"
+}
+
+warn_enable_scroll() {
+    if check_scroll_temp_file; then
+        return
+    fi
+
+    while true; do
+        read -r -a installed <<< "$(check_for_scroll_tool)"
+
+        if [ ${#installed[@]} -eq 0 ]; then
+            echo ""
+            echo "Warning: Some environments may not natively support scrolling, making troubleshooting very difficult. Before proceeding, please ensure your terminal supports scrolling."
+            echo ""
+            echo "If your terminal does not natively support scroll, you can install 'tmux', 'screen', or another tool using apt to scroll through old outputs."
+            echo ""
+            echo "Press 'Enter' to continue without using tmux or screen to scroll"
+            echo "Press 'Q' to quit and close the script..."
+            read -r response
+            case "$response" in
+                [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
+                *) break ;; # continue to stages
+            esac
+
+        elif [ ${#installed[@]} -eq 1 ]; then
+            while true; do
+                echo "Found ${installed[0]} installed."
+                echo ""
+                echo "If you start ${installed[0]} you will need to execute './start.sh' again to restart the script."
+                echo ""
+                echo "Press 'Enter' to start ${installed[0]}"
+                echo "Enter 'C' to continue without ${installed[0]}"
+                echo "Enter 'Q' to quit and close the script"
+                read -r response
+                case "$response" in
+                    [Cc]) echo "Continuing without ${installed[0]}."; break ;;
+                    [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
+                    *) 
+                        make_scroll_temp_file
+                        enter_scroll "${installed[0]}"
+                        ;;
+                esac
+            done
+        else
+            while true; do
+                echo "Found ${installed[0]} and ${installed[1]} installed."
+                echo ""
+                echo "If you start ${installed[0]} or ${installed[1]} you will need to execute './start.sh' again to restart the script."
+                echo ""
+                echo "Enter 'T' to start ${installed[0]}"
+                echo "Enter 'S' to start ${installed[1]}"
+                echo "Enter 'Q' to quit and close the script"
+                read -r choice
+                choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
+                case "$choice" in
+                    t) make_scroll_temp_file; enter_scroll "${installed[0]}" ;;
+                    s) make_scroll_temp_file; enter_scroll "${installed[1]}" ;;
+                    q) echo "Exiting initialize_my_terminal..."; exit 0 ;;
+                    *) echo "Invalid choice. Please enter 'T', 'S', or 'Q'" ;;
+                esac
+            done
+        fi
+    done
+}
+
+enter_scroll() {
+    case "$1" in
+        "tmux")
+            echo ""
+            echo "You are entering tmux."
+            echo "To scroll in tmux, enter 'Ctrl + B' followed by '[':"
+            echo "  - Up/Down Arrow or Pg Up/Pg Down to scroll up or down"
+            echo "  - ^U and ^D to scroll a half page up or down"
+            echo "  - 'gg' to go to the top of the buffer"
+            echo "  - 'G' to go to the bottom of the buffer"
+            echo "  - 'q' to exit"
+            echo ""
+            echo "Press Enter to continue and open tmux."
+            read -r
+            tmux
+            ;;
+        "screen")
+            echo ""
+            echo "You are entering screen."
+            echo "To scroll in screen, enter 'Ctrl+A' followed by 'Esc':"
+            echo "  - Up/Down Arrow or Pg Up/Pg Down to scroll up or down"
+            echo "  - ^U and ^D to scroll a half page up or down"
+            echo "  - Press 'Esc' again to exit copy mode."
+            echo ""
+            echo "Press Enter to continue and open screen."
+            read -r
+            screen
+            ;;
+        *)
+            echo "$1 is an invalid option."
+            exit 1
+            ;;
+    esac
+}
+
+make_scroll_temp_file() {
+    if [ ! -f "$scroll_temp_file" ]; then
+        touch "$scroll_temp_file"
+        echo "Scroll session recorded in $scroll_temp_file."
+    fi
+}
+
+clear_scroll_temp_file() {
+    if [ -f "$scroll_temp_file" ]; then
+        rm "$scroll_temp_file"
+        echo ""
+        echo "Scroll session flag removed from $scroll_temp_file."
+    fi
+}
+
+check_scroll_temp_file() {
+    [ -f "$scroll_temp_file" ]
 }
