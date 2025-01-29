@@ -151,6 +151,21 @@ enter_scroll() {
     esac
 }
 
+check_stage_temp_file() {
+    local stage_number=$1
+    local stage_temp_file="$temp_dir/stage_${stage_number}.temp"
+
+    [ -f "$stage_temp_file" ]
+}
+
+check_scroll_temp_file() {
+    [ -f "$scroll_temp_file" ]
+}
+
+check_zsh_setup_temp_file() {
+    [ -f "$zsh_setup_temp_file" ]
+}
+
 make_scroll_temp_file() {
     if check_scroll_temp_file; then
         echo "Scroll temp file already exists."
@@ -206,22 +221,6 @@ clear_zsh_setup_temp_file() {
         echo ""
         echo "Zsh setup session flag removed from $zsh_setup_temp_file."
     fi
-}
-
-
-check_stage_temp_file() {
-    local stage_number=$1
-    local stage_temp_file="$temp_dir/stage_${stage_number}.temp"
-
-    [ -f "$stage_temp_file" ]
-}
-
-check_scroll_temp_file() {
-    [ -f "$scroll_temp_file" ]
-}
-
-check_zsh_setup_temp_file() {
-    [ -f "$zsh_setup_temp_file" ]
 }
 
 start_wrapper() {
