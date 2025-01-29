@@ -283,4 +283,5 @@ for repo in "${PROJECT_REPOS[@]}"; do
     fi
 done
 
+echo ""
 echo "Stage 2 setup is complete. Configuring Zsh..."

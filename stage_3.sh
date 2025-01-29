@@ -84,6 +84,7 @@ else
     echo "skip_global_compinit=1 already exists in ~/.zshenv."
 fi
 
+echo ""
 echo "Stage 3 setup is complete. Setup complete. You may need to restart your terminal for some changes to take effect."
 echo ""
 echo "**Reminder** Set up gpg-agent and pass"

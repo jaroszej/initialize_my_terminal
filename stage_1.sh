@@ -59,6 +59,9 @@ check_dependencies() {
     else
         echo "All dependencies are already installed."
     fi
+
+    echo "setting default git branch to main"
+    git config --global init.defaultBranch main
 }
 
 install_zsh() {
@@ -172,6 +175,7 @@ if [ ! -f "$HOME/.zshrc" ]; then
 fi
 
 # Switch to Zsh and execute the second script
+echo ""
 echo "Stage 1 setup is complete. Switching to Zsh and continuing setup in stage_2.sh..."
 
 exec zsh stage_2.sh
