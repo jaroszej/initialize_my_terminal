@@ -28,24 +28,18 @@ prompt_skip_installs() {
             return
         fi
 
-        to_skip=()
-        invalid_input=false
-        for num in $skip_tools; do
-            case "$num" in
-                0) echo "all"; return ;;
-                1|2|3|4|5) to_skip+=("$num") ;;
-                *) 
-                    echo "!! Error: Invalid option: $num"
-                    invalid_input=true
-                    ;;
-            esac
-        done
-
-        # If valid, return the skipped items as a space-separated string
-        if ! $invalid_input; then
+        if [[ "$skip_tools" =~ ^[0-5\ ]+$ ]]; then
+            to_skip=()
+            for num in $skip_tools; do
+                case "$num" in
+                    0) echo "all"; return ;;
+                    1|2|3|4|5) to_skip+=("$num") ;;
+                esac
+            done
             echo "${to_skip[*]}"
             return
         else
+            echo "!! Error: Invalid input. Please enter 'c' to install all components or numbers 0-5 to skip specific installations."
             echo "Please try again."
         fi
     done
@@ -186,35 +180,27 @@ echo "apt updated and upgraded"
 
 installs_textwall
 skipping=$(prompt_skip_installs)
-echo "!!! Skipping: $skipping !!!" 
 
 if [ "$skipping" = "c" ]; then
     echo "Installing all components."
 else
-    while true; do
-        if [ "$skipping" = "all" ]; then
-            read -r -p "You chose to skip all installations. Are you sure? (y/n): " confirm
-        else
-            echo "You chose to skip: $skipping"
-            read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
-        fi
+    if [ "$skipping" = "all" ]; then
+        read -r -p "You chose to skip all installations. Are you sure? (y/n): " confirm
+    else
+        echo "You chose to skip: $skipping"
+        read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
+    fi
 
-        confirm="$(echo "$confirm" | tr '[:upper:]' '[:lower:]')"
-        if [ "$confirm" = "y" ]; then
-            break
-        elif [ "$confirm" = "n" ]; then
-            echo "Let's try again."
-            skipping=$(prompt_skip_installs)
-            echo ">>!!! Skipping: $skipping !!!<<" 
-            if [ "$skipping" = "c" ]; then
-                echo "Installing all components."
-                break
-            fi
-        else
-            echo "Invalid input. Please answer with 'y' or 'n'."
+    confirm="$(echo "$confirm" | tr '[:upper:]' '[:lower:]')"
+    if [ "$confirm" != "y" ]; then
+        echo "Let's try again."
+        skipping=$(prompt_skip_installs)
+        if [ "$skipping" = "c" ]; then
+            echo "Installing all components."
         fi
-    done
+    fi
 fi
+
 
 if [ "$skipping" = "all" ]; then
     SKIP_ALL=true
