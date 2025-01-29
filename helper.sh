@@ -69,7 +69,7 @@ warn_enable_scroll() {
             read -r response
             case "$response" in
                 [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
-                *) break ;; # continue to stages
+                *) return ;; # continue to stages
             esac
 
         elif [ ${#installed[@]} -eq 1 ]; then
@@ -83,11 +83,12 @@ warn_enable_scroll() {
                 echo "Enter 'Q' to quit and close the script"
                 read -r response
                 case "$response" in
-                    [Cc]) echo "Continuing without ${installed[0]}."; break ;;
+                    [Cc]) echo "Continuing without ${installed[0]}."; return ;;
                     [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
                     *) 
                         make_scroll_temp_file
                         enter_scroll "${installed[0]}"
+                        return
                         ;;
                 esac
             done
@@ -104,10 +105,11 @@ warn_enable_scroll() {
                 read -r choice
                 choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
                 case "$choice" in
-                    t) make_scroll_temp_file; enter_scroll "${installed[0]}" ;;
-                    s) make_scroll_temp_file; enter_scroll "${installed[1]}" ;;
+                    t) make_scroll_temp_file; enter_scroll "${installed[0]}"; return ;;
+                    s) make_scroll_temp_file; enter_scroll "${installed[1]}"; return ;;
                     q) echo "Exiting initialize_my_terminal..."; exit 0 ;;
-                    *) break ;;
+                    "") echo "Continuing without using tmux or screen."; return ;;
+                    *) echo "Invalid input. Please enter 'T', 'S', or 'Q' or press Enter to continue." ;;
                 esac
             done
         fi
