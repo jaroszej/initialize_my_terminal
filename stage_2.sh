@@ -132,7 +132,7 @@ install_homebrew() {
     cat << EOF >> ~/.zshrc
 
 # Homebrew
-eval "\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 EOF
     echo ""
