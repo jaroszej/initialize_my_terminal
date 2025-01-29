@@ -56,11 +56,12 @@ warn_enable_scroll() {
 
     while true; do
         read -r -a installed <<< "$(check_for_scroll_tool)"
+        
+        echo ""
+        echo "Warning: Some environments may not natively support scrolling, making troubleshooting very difficult. Before proceeding, please ensure your terminal supports scrolling."
+        echo ""
 
         if [ ${#installed[@]} -eq 0 ]; then
-            echo ""
-            echo "Warning: Some environments may not natively support scrolling, making troubleshooting very difficult. Before proceeding, please ensure your terminal supports scrolling."
-            echo ""
             echo "If your terminal does not natively support scroll, you can install 'tmux', 'screen', or another tool using apt to scroll through old outputs."
             echo ""
             echo "Press 'Enter' to continue without using tmux or screen to scroll"
@@ -96,6 +97,7 @@ warn_enable_scroll() {
                 echo ""
                 echo "If you start ${installed[0]} or ${installed[1]} you will need to execute './start.sh' again to restart the script."
                 echo ""
+                echo "Press 'Enter' to continue without starting ${installed[0]} or ${installed[1]}"
                 echo "Enter 'T' to start ${installed[0]}"
                 echo "Enter 'S' to start ${installed[1]}"
                 echo "Enter 'Q' to quit and close the script"
@@ -105,7 +107,7 @@ warn_enable_scroll() {
                     t) make_scroll_temp_file; enter_scroll "${installed[0]}" ;;
                     s) make_scroll_temp_file; enter_scroll "${installed[1]}" ;;
                     q) echo "Exiting initialize_my_terminal..."; exit 0 ;;
-                    *) echo "Invalid choice. Please enter 'T', 'S', or 'Q'" ;;
+                    *) break ;;
                 esac
             done
         fi
