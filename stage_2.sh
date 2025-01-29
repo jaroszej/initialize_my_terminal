@@ -186,6 +186,7 @@ echo "apt updated and upgraded"
 
 installs_textwall
 skipping=$(prompt_skip_installs)
+echo "!!! Skipping: $skipping !!!" 
 
 if [ "$skipping" = "c" ]; then
     echo "Installing all components."
@@ -204,6 +205,7 @@ else
         elif [ "$confirm" = "n" ]; then
             echo "Let's try again."
             skipping=$(prompt_skip_installs)
+            echo ">>!!! Skipping: $skipping !!!<<" 
             if [ "$skipping" = "c" ]; then
                 echo "Installing all components."
                 break
