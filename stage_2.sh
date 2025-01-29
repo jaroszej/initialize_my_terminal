@@ -249,8 +249,12 @@ if source_helper; then
         install_homebrew
 
         echo "Installing Homebrew sourced package(s)..."
-        retry_wrapper "brew install --cask fzf playwright ngrok croc" \
-            "echo '!! Error: Failed to install Homebrew casks.'"
+        homebrew_casks=("playwright" "ngrok" "croc")
+
+        for cask in "${homebrew_casks[@]}"; do
+            retry_wrapper "brew install --cask $cask" \
+                "echo '!! Error: Failed to install Homebrew cask $cask.'; exit 1;"
+        done
 
         # Directory setup
         PROJECTS_DIR="$HOME/projects"
