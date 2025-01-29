@@ -1,9 +1,9 @@
 #!/bin/bash
 
-
-scroll_temp_dir="/tmp/initialize_my_terminal"
-mkdir -p "$scroll_temp_dir"
-scroll_temp_file="$scroll_temp_dir/scroll_avail.temp"
+temp_dir="/tmp/initialize_my_terminal"
+mkdir -p "$temp_dir"
+scroll_temp_file="$temp_dir/scroll_avail.temp"
+zsh_setup_temp_file="$temp_dir/zsh_setup.temp"
 
 try_catch() {
     local try_command=$1
@@ -152,22 +152,12 @@ enter_scroll() {
 }
 
 make_scroll_temp_file() {
-    if [ ! -f "$scroll_temp_file" ]; then
+    if check_scroll_temp_file; then
+        echo "Scroll temp file already exists."
+    else
         touch "$scroll_temp_file"
         echo "Scroll session recorded in $scroll_temp_file."
     fi
-}
-
-clear_scroll_temp_file() {
-    if [ -f "$scroll_temp_file" ]; then
-        rm "$scroll_temp_file"
-        echo ""
-        echo "Scroll session flag removed from $scroll_temp_file."
-    fi
-}
-
-check_scroll_temp_file() {
-    [ -f "$scroll_temp_file" ]
 }
 
 make_stage_temp_file() {
@@ -182,6 +172,24 @@ make_stage_temp_file() {
     fi
 }
 
+make_zsh_setup_temp_file() {
+    if check_zsh_setup_temp_file; then
+        echo "Zsh setup temp file already exists."
+    else
+        touch "$zsh_setup_temp_file"
+        echo "Zsh setup session recorded in $zsh_setup_temp_file."
+    fi
+}
+
+
+clear_scroll_temp_file() {
+    if check_scroll_temp_file; then
+        rm "$scroll_temp_file"
+        echo ""
+        echo "Scroll session flag removed from $scroll_temp_file."
+    fi
+}
+
 clear_stage_temp_files() {
     for stage in {1..3}; do
         local stage_temp_file="$scroll_temp_dir/stage_${stage}.temp"
@@ -192,11 +200,28 @@ clear_stage_temp_files() {
     done
 }
 
+clear_zsh_setup_temp_file() {
+    if check_zsh_setup_temp_file; then
+        rm "$zsh_setup_temp_file"
+        echo ""
+        echo "Zsh setup session flag removed from $zsh_setup_temp_file."
+    fi
+}
+
+
 check_stage_temp_file() {
     local stage_number=$1
     local stage_temp_file="$scroll_temp_dir/stage_${stage_number}.temp"
 
     [ -f "$stage_temp_file" ]
+}
+
+check_scroll_temp_file() {
+    [ -f "$scroll_temp_file" ]
+}
+
+check_zsh_setup_temp_file() {
+    [ -f "$zsh_setup_temp_file" ]
 }
 
 start_wrapper() {

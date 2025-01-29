@@ -87,3 +87,14 @@ handle_homebrew_error() {
     echo "  - Manually install Homebrew: https://brew.sh/"
     echo "------------------------------------------------------------------------------------"
 }
+
+handle_zsh_config_error() {
+    echo "--| stage 2 |-----------------------------------------------------------------------"
+    echo "Error: Zsh configuration failed."
+    echo "Possible issues:"
+    echo "  - Network issues during package download."
+    echo "  - Missing dependencies."
+    echo "What to do:"
+    echo "  - Manually install Zsh: sudo apt install zsh"
+    echo "------------------------------------------------------------------------------------"
+}

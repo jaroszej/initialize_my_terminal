@@ -2,52 +2,6 @@
 
 set -e
 
-installs_textwall() {
-    cat <<EOF
-
-Enter numbers to skip specific installations (e.g., '1 3 5').
-
-Options:
-[1] Docker and Docker Compose
-[2] Golang
-[3] Java
-[4] NVM and the latest Node.js LTS version
-[5] Rust
-[0] Continue with all installations (skip nothing)
-[6] Skip all installations
-
-EOF
-}
-
-prompt_skip_installs() {
-    while true; do
-        installs_textwall
-        read -r -p "Enter your choice: " skip_tools
-
-        if [[ "$skip_tools" =~ ^[0-6\ ]+$ ]]; then
-            if [[ "$skip_tools" =~ \b0\b ]]; then
-                echo "continue"
-                return
-            elif [[ "$skip_tools" =~ \b6\b ]]; then
-                echo "all"
-                return
-            else
-                to_skip=()
-                for num in $skip_tools; do
-                    case "$num" in
-                        1|2|3|4|5) to_skip+=("$num") ;;
-                    esac
-                done
-                echo "${to_skip[*]}"
-                return
-            fi
-        else
-            echo "!! Error: Invalid input. Please enter numbers 0-6 to skip specific installations."
-            echo "Please try again."
-        fi
-    done
-}
-
 install_docker() {
     echo "Installing Docker and Docker Compose..."
     try_catch \
@@ -141,8 +95,10 @@ fi
 
 export ZSH_CONFIG="$HOME/.zshrc"
 
-# Create a flag file to indicate Zsh setup completion
-touch /tmp/zsh_installed
+try_catch \
+    "make_zsh_setup_temp_file" \
+    handle_zsh_config_error
+
 
 echo "Installing Oh My Zsh..."
 echo "This will replace your existing .zshrc file"
@@ -181,52 +137,12 @@ echo "Updating and upgrading system packages..."
 sudo apt update && sudo apt upgrade -y
 echo "apt updated and upgraded"
 
-skipping=$(prompt_skip_installs)
+install_docker
+install_golang
+install_java
+install_nvm_node
+install_rust
 
-if [ "$skipping" = "continue" ]; then
-    echo "Continuing to installations..."
-elif [ "$skipping" = "all" ]; then
-    echo "Skipping all installations."
-else
-    echo "You chose to skip: $skipping"
-    read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
-    confirm="$(echo "$confirm" | tr '[:upper:]' '[:lower:]')"
-    if [ "$confirm" != "y" ]; then
-        echo "Let's try again."
-        skipping=$(prompt_skip_installs)
-        if [ "$skipping" = "continue" ]; then
-            echo "Continuing with all installations (nothing skipped)."
-        fi
-    fi
-fi
-
-# Set skip flags based on user input
-if [ "$skipping" = "all" ]; then
-    SKIP_ALL=true
-elif [ "$skipping" != "continue" ]; then
-    for val in $skipping; do
-        case "$val" in
-            1) SKIP_DOCKER=true ;;
-            2) SKIP_GOLANG=true ;;
-            3) SKIP_JAVA=true ;;
-            4) SKIP_NODE=true ;;
-            5) SKIP_RUST=true ;;
-        esac
-    done
-fi
-
-# Install tools based on flags
-if [ "$SKIP_ALL" = true ]; then
-    echo "Skipping all installations."
-else
-    [ "$SKIP_DOCKER" != true ] && install_docker
-    [ "$SKIP_GOLANG" != true ] && install_golang
-    [ "$SKIP_JAVA" != true ] && install_java
-    [ "$SKIP_NODE" != true ] && install_nvm_node
-    [ "$SKIP_RUST" != true ] && install_rust
-fi
-
-# Install Homebrew after all other tools
 install_homebrew
 
 echo "Installing Homebrew sourced package(s)..."
