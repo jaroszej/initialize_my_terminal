@@ -77,12 +77,20 @@ install_nvm_node() {
     fi
 
     echo "Installing the latest LTS version of Node.js..."
-    retry_wrapper "nvm install --lts" "handle_node_error"
-    echo "Node.js LTS installed successfully: $(node -v)"
+    if retry_wrapper "nvm install --lts" "handle_node_error"; then
+        echo "Node.js LTS installed successfully: $(node -v)"
+    else
+        echo "!! Error: Failed to install Node.js LTS."
+        exit 1
+    fi
 
     echo "Installing pnpm..."
-    retry_wrapper "npm install -g pnpm" "handle_pnpm_error"
-    echo "pnpm installed successfully: $(pnpm -v)"
+    if retry_wrapper "npm install -g pnpm" "handle_pnpm_error"; then
+        echo "pnpm installed successfully: $(pnpm -v)"
+    else
+        echo "!! Error: Failed to install pnpm."
+        exit 1
+    fi
     echo ""
 }
 
@@ -123,7 +131,9 @@ install_homebrew() {
     echo "Configuring Homebrew environment..."
     {
         echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
-    } | tee -a "$HOME/.bashrc" "$HOME/.zshrc" > /dev/null
+    } | tee -a "$bash_config" "$zsh_config" > /dev/null
+
+    refresh_shell
 
     try_catch "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" \
         "echo '!! Error: Failed to initialize Homebrew shell environment.'"
@@ -167,35 +177,16 @@ if source_helper; then
         fi
 
         # ensuring curl, git, etc are installed again in case user migrated scripts via hard storage device
-        echo "Installing essential tools and utilities..."
+        echo "Installing essential tools and utilities... This may take a while..."
         if [ "$YES" = true ]; then
             APT_FLAG="-y "
         else
             APT_FLAG=""
         fi
         retry_wrapper "
-            sudo apt install $APT_FLAG\
-                build-essential \
-                xclip \
-                curl \
-                wget \
-                git \
-                unzip \
-                zip \
-                vim \
-                tmux \
-                gnupg \
-                pass \
-                ffmpeg \
-                neovim \
-                python3-pip \
-                python3-venv \
-                bat \
-                btop \
-                pwgen \
-                jq \
-                moreutils
-        " "echo '!! Error: Failed to install essential utilities.'"
+            sudo apt install $APT_FLAG build-essential xclip curl wget git unzip zip vim tmux gnupg pass ffmpeg \
+neovim python3-pip python3-venv bat btop pwgen jq moreutils
+" "echo '!! Error: Failed to install essential utilities.'"
 
         echo "Updating and upgrading system packages..."
         retry_wrapper "sudo apt update && sudo apt upgrade -y" \

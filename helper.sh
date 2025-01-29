@@ -5,6 +5,32 @@ mkdir -p "$temp_dir"
 scroll_temp_file="$temp_dir/scroll_avail.temp"
 zsh_setup_temp_file="$temp_dir/zsh_setup.temp"
 
+export zsh_config="$HOME/.zshrc"
+export bash_config="$HOME/.bashrc"
+
+check_shell() {
+    ps -p $$ -o comm=
+}
+
+refresh_shell() {
+    CURRENT_SHELL=$(check_shell)
+    case "$CURRENT_SHELL" in
+        bash)
+            echo "Running in Bash, reloading ~/.bashrc"
+            # shellcheck disable=SC1090
+            source "$bash_config"
+            ;;
+        zsh)
+            echo "Running in Zsh, reloading ~/.zshrc"
+            # shellcheck disable=SC1090
+            source "$zsh_config"
+            ;;
+        *)
+            echo "Unknown shell: $CURRENT_SHELL"
+            ;;
+    esac
+}
+
 try_catch() {
     local try_command="$1"
     local catch_command="$2"
