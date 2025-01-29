@@ -51,6 +51,7 @@ run_stage() {
     fi
 }
 
+source_files
 warn_enable_scroll
 
 # Run stages
