@@ -3,58 +3,52 @@
 set -e
 
 installs_textwall() {
-    echo ""
-    echo "Press 'c' to continue and install all components, or enter numbers to skip specific installations (e.g., '1 3 5')."
-    echo ""
-    echo "Options:"
-    echo "[1] Docker and Docker Compose"
-    echo "[2] Golang"
-    echo "[3] Java"
-    echo "[4] NVM and the latest Node.js LTS version"
-    echo "[5] Rust"
-    echo "[0] Skip all installations"
-    echo ""
+    cat <<EOF
+
+Press 'c' to continue and install all components, or enter numbers to skip specific installations (e.g., '1 3 5').
+
+Options:
+[1] Docker and Docker Compose
+[2] Golang
+[3] Java
+[4] NVM and the latest Node.js LTS version
+[5] Rust
+[0] Skip all installations
+
+EOF
 }
 
 prompt_skip_installs() {
     while true; do
         installs_textwall
-        read -r skip_tools
+        read -r -p "Enter your choice: " skip_tools
 
         if [[ "$skip_tools" =~ ^[cC]$ ]]; then
-            to_skip="c"
-            break
+            echo "c"
+            return
         fi
 
-        to_skip=""
+        to_skip=()
         invalid_input=false
         for num in $skip_tools; do
             case "$num" in
-                0)
-                    to_skip="all"
-                    break
-                    ;;
-                1|2|3|4|5)
-                    to_skip+="$num "
-                    ;;
-                *)
+                0) echo "all"; return ;;
+                1|2|3|4|5) to_skip+=("$num") ;;
+                *) 
                     echo "!! Error: Invalid option: $num"
                     invalid_input=true
                     ;;
             esac
         done
 
-        if [ "$invalid_input" = false ]; then
-            break
+        # If valid, return the skipped items as a space-separated string
+        if ! $invalid_input; then
+            echo "${to_skip[*]}"
+            return
         else
             echo "Please try again."
         fi
     done
-
-    # Trim trailing whitespace from to_skip
-    to_skip="${to_skip%"${to_skip##*[![:space:]]}"}"
-
-    echo "$to_skip"
 }
 
 install_docker() {
@@ -210,8 +204,8 @@ else
         elif [ "$confirm" = "n" ]; then
             echo "Let's try again."
             skipping=$(prompt_skip_installs)
-            if [ -z "$skipping" ]; then
-                echo "Continuing to installs..."
+            if [ "$skipping" = "c" ]; then
+                echo "Installing all components."
                 break
             fi
         else
