@@ -249,7 +249,7 @@ if source_helper; then
         install_homebrew
 
         echo "Installing Homebrew sourced package(s)..."
-        homebrew_casks=("playwright" "ngrok" "croc")
+        homebrew_casks=("ngrok" "croc")
 
         for cask in "${homebrew_casks[@]}"; do
             retry_wrapper "brew install --cask $cask" \
