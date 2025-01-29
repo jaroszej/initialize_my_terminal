@@ -111,8 +111,15 @@ install_homebrew() {
         return 0
     fi
 
+    echo "Installing required dependencies for Homebrew..."
+    sudo apt-get update
+    sudo apt-get install -y build-essential procps file || {
+        echo "!! Error: Failed to install dependencies for Homebrew."
+        exit 1
+    }
+
     retry_wrapper "
-        NONINTERACTIVE=1 /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" </dev/null
+        NONINTERACTIVE=1 bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"
     " "echo '!! Error: Homebrew installation failed.'" "$stagename"
 
     if ! command -v brew >/dev/null 2>&1; then
@@ -130,6 +137,7 @@ install_homebrew() {
     # shellcheck disable=SC1090
     source "$ZSH_CONFIG"
 }
+
 
 
 while [ $# -gt 0 ]; do # parse command line args 
