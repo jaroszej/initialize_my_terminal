@@ -39,7 +39,7 @@ run_stage() {
 
     start_wrapper "--> Starting Stage $stage_number..."
 
-    if ! ./"$stage_script"; then
+    if ! source "$stage_script"; then
         echo ""
         start_wrapper "!! Error: Stage $stage_number failed."
         echo "Check the logs above for specific errors."
@@ -51,20 +51,20 @@ run_stage() {
     fi
 }
 
+# Source all necessary files
 source_files
+
 warn_enable_scroll
 
 # Run stages
 for i in {1..3}; do
-    # Source all necessary files
-    source_files
     if check_stage_temp_file "$i"; then
         start_wrapper "INFO: Stage $i temp file detected. Skipping stage $i."
     else
         num=$(("$i" - 1))
         start_wrapper " Progress: Stage $num/3"
 
-        if run_stage "$i"; then    
+        if run_stage "$i"; then
             make_stage_temp_file "$i"
         else
             start_wrapper "!! Error: Unexpected failure. You may need to remove temp files in /tmp/initialize_my_terminal/ to restart from scratch."
