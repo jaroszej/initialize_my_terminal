@@ -84,7 +84,7 @@ check_installed() {
 
 warn_enable_scroll() {
     while true; do
-        mapfile -t installed < <(check_installed)
+        read -r -a installed <<< "$(check_installed)"
 
         if [ ${#installed[@]} -eq 0 ]; then
             echo ""
