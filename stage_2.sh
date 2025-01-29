@@ -4,6 +4,19 @@ set -e
 
 stagename="stage 2"
 
+source_helper() {
+    local script_dir="$(dirname "$0")"
+
+    local helper_file="$script_dir/helper.sh"
+    if [ -f "$helper_file" ]; then
+        source "$helper_file"
+    else
+        wrapper_frame "$stagename" "!! Error: Helper file not found at $helper_file"
+        exit 1
+    fi
+
+}
+
 retry_wrapper() {
     local cmd="$1"
     local error_handler="$2"
