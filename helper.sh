@@ -6,36 +6,18 @@ scroll_temp_file="$temp_dir/scroll_avail.temp"
 zsh_setup_temp_file="$temp_dir/zsh_setup.temp"
 
 try_catch() {
-    local try_command=$1
-    local catch_command=$2
+    local try_command="$1"
+    local catch_command="$2"
 
-    if output=$($try_command 2>&1); then
+    if output=$(eval "$try_command" 2>&1); then
         echo "Success: $try_command"
     else
         local exit_code=$?
         echo "!! Error: $try_command failed with exit code $exit_code"
         echo "Output: $output"
-        $catch_command
+        eval "$catch_command"
         return $exit_code
     fi
-}
-
-try_catch_finally() {
-    local try_command=$1
-    local catch_command=$2
-    local finally_command=$3
-
-    if output=$($try_command 2>&1); then
-        echo "Success: $try_command"
-    else
-        local exit_code=$?
-        echo "!! Error: $try_command failed with exit code $exit_code"
-        echo "Command output: $output"
-        $catch_command
-        return $exit_code
-    fi
-
-    $finally_command
 }
 
 retry_command() {
@@ -55,15 +37,17 @@ retry_command() {
             echo "!! Warning: Command failed, retrying once..."
         fi
         sleep 2
-        retry_command "$cmd" "$error_handler" "$stagename" 2
-    else
-        if [ -n "$stagename" ]; then
-            wrapper_frame "$stagename" "!! Error: Command failed after retry."
-        else
-            echo "!! Error: Command failed after retry."
+        if retry_command "$cmd" "$error_handler" "$stagename" 2; then
+            return 0
         fi
-        return 1
     fi
+
+    if [ -n "$stagename" ]; then
+        wrapper_frame "$stagename" "!! Error: Command failed after retry."
+    else
+        echo "!! Error: Command failed after retry."
+    fi
+    return 1
 }
 
 source_files() {

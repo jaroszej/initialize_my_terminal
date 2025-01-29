@@ -117,24 +117,13 @@ install_homebrew() {
     }
 
     echo "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || {
-        echo "!! Error: Homebrew installation failed."
-        exit 1
-    }
+    try_catch \
+        "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" \
+        'echo "!! Error: Homebrew installation failed."; exit 1'
 
-    if ! command -v brew >/dev/null 2>&1; then
-        echo "!! Error: Homebrew installation failed or brew command not found."
-        exit 1
-    fi
-
-    echo "Homebrew installed successfully: $(brew --version)"
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-    cat << EOF >> ~/.zshrc
-
-# Homebrew
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-EOF
+    try_catch \
+        "echo >> \"$HOME/.zshrc\"; echo 'eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"' >> \"$HOME/.zshrc\"; eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" \
+        "echo '!! Error: Failed to add Homebrew to .zshrc.'; exit 1"
 
     source ~/.zshrc
 }
