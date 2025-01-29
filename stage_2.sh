@@ -117,15 +117,16 @@ install_homebrew() {
     }
 
     echo "Installing Homebrew..."
-    try_catch \
-        "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" \
-        'echo "!! Error: Homebrew installation failed."; exit 1'
+    retry_wrapper "NONINTERACTIVE=1 /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" \
+        "echo '!! Error: Homebrew installation failed.'"
 
-    try_catch \
-        "echo >> \"$HOME/.zshrc\"; echo 'eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"' >> \"$HOME/.zshrc\"; eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" \
-        "echo '!! Error: Failed to add Homebrew to .zshrc.'; exit 1"
+    echo "Configuring Homebrew environment..."
+    {
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+    } | tee -a "$HOME/.bashrc" "$HOME/.zshrc" > /dev/null
 
-    source ~/.zshrc
+    try_catch "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" \
+        "echo '!! Error: Failed to initialize Homebrew shell environment.'"
 }
 
 while [ $# -gt 0 ]; do # parse command line args 
