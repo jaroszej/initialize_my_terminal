@@ -37,7 +37,12 @@ retry_wrapper() {
 
 install_docker() {
     echo "Installing Docker and Docker Compose..."
-    retry_wrapper "sudo apt update && sudo apt install -y docker.io docker-compose" "handle_docker_error"
+    docker_packages=("docker.io" "docker-compose")
+
+    for package in "${docker_packages[@]}"; do
+        retry_wrapper "install_necessary_package $package $APT_FLAG" "handle_docker_error $package"
+    done
+
     sudo systemctl start docker
     sudo systemctl enable docker
     echo "Docker installed successfully: $(docker --version)"
@@ -46,14 +51,15 @@ install_docker() {
 
 install_golang() {
     echo "Installing Golang..."
-    retry_wrapper "sudo apt update && sudo apt install -y golang" "handle_golang_error"
+    retry_wrapper "insstall_necessary_package golang -y" "handle_golang_error"
     echo "Golang installed successfully: $(go version)"
     echo ""
 }
 
 install_java() {
     echo "Installing Java..."
-    retry_wrapper "sudo apt update && sudo apt install -y openjdk-17-jdk" "handle_java_error"
+    java_version="openjdk-17-jdk"
+    retry_wrapper "install_necessary_package $java_version -y" "handle_java_error"
     echo "Java installed successfully: $(java -version)"
     echo ""
 }
@@ -187,10 +193,47 @@ if source_helper; then
         else
             APT_FLAG=""
         fi
-        retry_wrapper "
-            sudo apt install $APT_FLAG build-essential xclip curl wget git unzip zip vim tmux gnupg pass ffmpeg \
-neovim python3-pip python3-venv bat btop pwgen jq moreutils
-" "echo '!! Error: Failed to install essential utilities.'"
+
+        priority_packages=(
+            "build-essential"
+            "make"
+            "gcc"
+            "xclip"
+            "curl"
+            "wget"
+            "git"
+            "unzip"
+            "zip"
+            "vim"
+            "tmux"
+            "gnupg"
+            "pass"
+            "python3-pip"
+            "python3-venv"
+        )
+
+        optional_packages=(
+            "ffmpeg"
+            "neovim"
+            "bat"
+            "btop"
+            "pwgen"
+            "jq"
+            "moreutils"
+            "fzf"
+        )
+
+        for package in "${priority_packages[@]}"; do
+            try_catch \
+                "install_necessary_package $package $APT_FLAG" \
+                "echo 'NOTE: This is a blocking error. You may need to manually install $package and then rerun the script'"
+        done
+
+        for package in "${optional_packages[@]}"; do
+            try_catch \
+                "install_optional_package $package $APT_FLAG" \
+                "echo 'NOTE: This is a non-blocking error. You may continue without $package installed. View failed optional packages in $OPTIONAL_PKG_LOG'"
+        done
 
         echo "Updating and upgrading system packages..."
         retry_wrapper "sudo apt update && sudo apt upgrade -y" \

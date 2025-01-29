@@ -35,7 +35,7 @@ check_dependencies() {
 
         for dep in "${missing_dependencies[@]}"; do
             try_catch \
-                "sudo apt install -y $dep" \
+                "install_necessary_package $dep -y" \
                 "echo 'Failed to install $dep.'; failed_dependencies+=(\"$dep\")"
         done
 
@@ -56,7 +56,7 @@ check_dependencies() {
 install_zsh() {
     echo "Installing Zsh..."
     try_catch \
-        "sudo apt install -y zsh" \
+        "install_necessary_package zsh -y" \
         handle_zsh_error
     echo "Zsh installed successfully: $(zsh --version)"
 }
@@ -97,9 +97,7 @@ done
 if source_helper; then
     if source_files; then
         # main logic
-        echo "Updating and upgrading system packages..."
-        sudo apt update && sudo apt upgrade -y
-
+        update_and_upgrade
         check_dependencies
 
         echo "Checking if Zsh is installed..."

@@ -2,7 +2,7 @@
 
 handle_docker_error() {
     echo "--| stage 2 |-----------------------------------------------------------------------"
-    echo "Error: Docker installation failed."
+    echo "Error: Docker installation failed. Attempted to install $1"
     echo "Possible issues:"
     echo "  - Network issues during package download."
     echo "  - Missing dependencies."

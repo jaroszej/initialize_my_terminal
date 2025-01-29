@@ -1,10 +1,11 @@
 #!/bin/bash
 
 temp_dir="/tmp/initialize_my_terminal"
-mkdir -p "$temp_dir"
+after_install="./after_install"
+mkdir -p "$temp_dir" "$after_install"
 scroll_temp_file="$temp_dir/scroll_avail.temp"
 zsh_setup_temp_file="$temp_dir/zsh_setup.temp"
-
+export OPTIONAL_PKG_LOG="$after_install/optional_packages_failed.log"
 export zsh_config="$HOME/.zshrc"
 export bash_config="$HOME/.bashrc"
 
@@ -88,6 +89,42 @@ source_files() {
             exit 1
         fi
     done
+}
+
+update_and_upgrade() {
+    echo "Updating and upgrading system packages..."
+    sudo apt update && sudo apt upgrade -y
+}
+
+install_necessary_package() {
+    local package="$1"
+    local yes=$2
+
+    echo "Installing necessary package: $package..."
+    if sudo apt install -y "$package"; then
+        echo "Successfully installed $package"
+    else
+        echo "!! Error: Failed to install $package"
+        exit 1
+    fi
+}
+
+install_optional_package() {
+    local package="$1"
+    local yes=$2
+
+    echo "Installing optional package: $package..."
+    if sudo apt install -y "$package"; then
+        echo "Successfully installed $package"
+    else
+        echo "!! Warning: Failed to install $package"
+        
+        # Check if package is already logged
+        if ! grep -qx "$package" "$OPTIONAL_PKG_LOG" 2>/dev/null; then
+            echo "$package" >> "$OPTIONAL_PKG_LOG"
+            echo "Logged $package as failed in $OPTIONAL_PKG_LOG"
+        fi
+    fi
 }
 
 check_for_scroll_tool() {
