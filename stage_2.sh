@@ -18,6 +18,11 @@ prompt_skip_installs() {
         echo "Press Enter to continue and install all."
 
         read -r skip_tools
+        
+        if [ -z "$skip_tools" ]; then
+            to_skip=""
+            break
+        fi
 
         to_skip=""
         invalid_input=false
