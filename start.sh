@@ -51,18 +51,17 @@ run_stage() {
     fi
 }
 
-# Source all necessary files
-source_files
-
 warn_enable_scroll
 
 # Run stages
 for i in {1..3}; do
+    # Source all necessary files
+    source_files
     if check_stage_temp_file "$i"; then
         start_wrapper "INFO: Stage $i temp file detected. Skipping stage $i."
     else
         num=$(("$i" - 1))
-        start_wrapper " Stage: $num/3"
+        start_wrapper " Progress: Stage $num/3"
 
         if run_stage "$i"; then    
             make_stage_temp_file "$i"

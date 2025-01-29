@@ -99,7 +99,6 @@ try_catch \
     "make_zsh_setup_temp_file" \
     handle_zsh_config_error
 
-
 echo "Installing Oh My Zsh..."
 echo "This will replace your existing .zshrc file"
 echo "The existing .zshrc file will be backed up to .zshrc.pre-oh-my-zsh"
