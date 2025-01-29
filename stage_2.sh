@@ -51,7 +51,7 @@ install_docker() {
 
 install_golang() {
     echo "Installing Golang..."
-    retry_wrapper "insstall_necessary_package golang -y" "handle_golang_error"
+    retry_wrapper "install_necessary_package golang -y" "handle_golang_error"
     echo "Golang installed successfully: $(go version)"
     echo ""
 }
