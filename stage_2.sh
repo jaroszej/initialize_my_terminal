@@ -193,9 +193,9 @@ neovim python3-pip python3-venv bat btop pwgen jq moreutils
             "echo '!! Error: Failed to upgrade packages.'"
         echo "apt updated and upgraded"
 
-        install_docker
-        install_golang
         install_java
+        install_golang
+        install_docker
         install_nvm_node
         install_rust
 
