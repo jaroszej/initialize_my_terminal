@@ -277,6 +277,8 @@ if source_helper; then
             "roszeSoftUtilitySuite"
         )
 
+        # TODO: user prompted for username and pass here- investigate
+
         for repo in "${PROJECT_REPOS[@]}"; do
             REPO_DIR="$PROJECTS_DIR/$repo"
             if [ ! -d "$REPO_DIR" ]; then
