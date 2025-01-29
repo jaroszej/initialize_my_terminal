@@ -38,6 +38,48 @@ try_catch_finally() {
     $finally_command
 }
 
+retry_command() {
+    local cmd="$1"
+    local error_handler="$2"
+    local stagename="${3:-}"
+    local attempt="${4:-1}"
+
+    if try_catch "$cmd" "$error_handler"; then
+        return 0
+    fi
+
+    if [ "$RETRY" = true ] && [ "$attempt" -eq 1 ]; then
+        if [ -n "$stagename" ]; then
+            wrapper_frame "$stagename" "!! Warning: Command failed, retrying once..."
+        else
+            echo "!! Warning: Command failed, retrying once..."
+        fi
+        sleep 2
+        retry_command "$cmd" "$error_handler" "$stagename" 2
+    else
+        if [ -n "$stagename" ]; then
+            wrapper_frame "$stagename" "!! Error: Command failed after retry."
+        else
+            echo "!! Error: Command failed after retry."
+        fi
+        return 1
+    fi
+}
+
+source_files() {
+    local script_dir="$(dirname "$0")"
+    # Source all error handler files
+    for stage in 1 2 3; do
+        local error_handlers_file="$script_dir/stage_${stage}_error_handlers.sh"
+        if [ -f "$error_handlers_file" ]; then
+            source "$error_handlers_file"
+        else
+            start_wrapper "!! Error: Error handlers file not found at $error_handlers_file"
+            exit 1
+        fi
+    done
+}
+
 check_for_scroll_tool() {
     local installed=()
     if which tmux >/dev/null 2>&1; then
@@ -223,8 +265,8 @@ clear_zsh_setup_temp_file() {
     fi
 }
 
-start_wrapper() {
-    echo "==| start |========================================================================="
-    echo "$1"
+wrapper_frame() {
+    echo "==| $1 |========================================================================="
+    echo "$2"
     echo "===================================================================================="
 }

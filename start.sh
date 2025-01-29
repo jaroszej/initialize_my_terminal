@@ -2,46 +2,40 @@
 
 set -e
 
-source_files() {
+stagename="start"
+
+source_helper() {
     local script_dir="$(dirname "$0")"
 
     local helper_file="$script_dir/helper.sh"
     if [ -f "$helper_file" ]; then
         source "$helper_file"
     else
-        start_wrapper "!! Error: Helper file not found at $helper_file"
+        wrapper_frame "$stagename" "!! Error: Helper file not found at $helper_file"
         exit 1
     fi
 
-    # Source all error handler files
-    for stage in 1 2 3; do
-        local error_handlers_file="$script_dir/stage_${stage}_error_handlers.sh"
-        if [ -f "$error_handlers_file" ]; then
-            source "$error_handlers_file"
-        else
-            start_wrapper "!! Error: Error handlers file not found at $error_handlers_file"
-            exit 1
-        fi
-    done
 }
 
 run_stage() {
     local stage_script="stage_$1.sh"
     local stage_number=$1
+    local retry=$2
+    local autoyes=$3
 
     if [ ! -f "$stage_script" ]; then
-        start_wrapper "!! Error: Stage $stage_number script ($stage_script) not found."
+        wrapper_frame "$stagename" "!! Error: Stage $stage_number script ($stage_script) not found."
         exit 1
     elif [ ! -x "$stage_script" ]; then
-        start_wrapper "!! Error: Stage $stage_number script ($stage_script) is not executable."
+        wrapper_frame "$stagename" "!! Error: Stage $stage_number script ($stage_script) is not executable."
         exit 1
     fi
 
-    start_wrapper "--> Starting Stage $stage_number..."
+    wrapper_frame "$stagename" "--> Starting Stage $stage_number..."
 
-    if ! source "$stage_script"; then
+    if ! ./"$stage_script" ${retry:+-r} ${autoyes:+-y}; then
         echo ""
-        start_wrapper "!! Error: Stage $stage_number failed."
+        wrapper_frame "$stagename" "!! Error: Stage $stage_number failed."
         echo "Check the logs above for specific errors."
         echo ""
         echo "Refer to the error handler in $stage_script for resolution steps."
@@ -51,35 +45,69 @@ run_stage() {
     fi
 }
 
-# Source all necessary files
-source_files
-
-warn_enable_scroll
-
-# Run stages
-for i in {1..3}; do
-    if check_stage_temp_file "$i"; then
-        start_wrapper "INFO: Stage $i temp file detected. Skipping stage $i."
-    else
-        num=$(("$i" - 1))
-        start_wrapper " Progress: Stage $num/3"
-
-        if run_stage "$i"; then
-            make_stage_temp_file "$i"
-        else
-            start_wrapper "!! Error: Unexpected failure. You may need to remove temp files in /tmp/initialize_my_terminal/ to restart from scratch."
+while [ $# -gt 0 ]; do # parse command line args to pass to stages
+    case "$1" in
+        -r|--retry)
+            RETRY=true
+            shift
+            ;;
+        -y|--yes)
+            YES=true
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $0 [options]"
+            echo "Options:"
+            echo "  -h, --help    Show this help message"
+            echo "  -r, --retry   Retry installations if failed"
+            echo "  -y, --yes     Auto accept all confirmation prompts"
+            exit 0
+            ;;
+        *)
+            echo "!! Error: Unknown option: $1"
+            echo "Use -h or --help for usage."
             exit 1
-        fi
-    fi
+            ;;
+    esac
 done
 
-clear_scroll_temp_file
-clear_stage_temp_files
+if source_helper; then
+    if source_files; then
+        warn_enable_scroll
 
-echo ""
-start_wrapper " Stage 3/3"
-echo ""
-echo "OK: All stages completed successfully! Your environment is now set up."
-echo "NOTE: You may need to restart your terminal or run 'source ~/.zshrc' to apply changes."
-echo "===================================================================================="
-echo ""
+        # Run stages
+        for i in {1..3}; do
+            if check_stage_temp_file "$i"; then
+                wrapper_frame "$stagename" "INFO: Stage $i temp file detected. Skipping stage $i."
+            else
+                num=$(("$i" - 1))
+                wrapper_frame "$stagename" " Progress: Stage $num/3"
+
+                if run_stage "$i" "$RETRY" "$YES"; then
+                    make_stage_temp_file "$i"
+                else
+                    wrapper_frame "$stagename" "!! Error: Unexpected failure. You may need to remove temp files in /tmp/initialize_my_terminal/ to restart from scratch."
+                    exit 1
+                fi
+            fi
+        done
+
+        clear_scroll_temp_file
+        clear_stage_temp_files
+
+        echo ""
+        wrapper_frame "$stagename" " Stage 3/3"
+        echo ""
+        echo "OK: All stages completed successfully! Your environment is now set up."
+        echo "NOTE: You may need to restart your terminal or run 'source ~/.zshrc' to apply changes."
+        echo "===================================================================================="
+        echo ""
+
+    else
+        wrapper_frame "$stagename" "!! Error: Failed to source needed files."
+        exit 1
+    fi
+else
+    wrapper_frame "$stagename" "!! Error: Failed to source helper file."
+    exit 1
+fi
