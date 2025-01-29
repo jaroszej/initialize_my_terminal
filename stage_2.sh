@@ -177,8 +177,7 @@ sudo apt install -y \
     btop \
     pwgen \
     jq \
-    moreutils \
-    croc 
+    moreutils 
 
 echo "Updating and upgrading system packages..."
 sudo apt update && sudo apt upgrade -y
@@ -249,7 +248,7 @@ install_homebrew
 
 echo "Installing Homebrew sourced package(s)..."
 try_catch \
-    "brew install --cask fzf playwright ngrok" \
+    "brew install --cask fzf playwright ngrok croc" \
     "echo '!! Error: Failed to install Homebrew casks.'"
 
 # Directory setup
