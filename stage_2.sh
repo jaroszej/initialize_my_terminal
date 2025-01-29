@@ -129,14 +129,14 @@ install_homebrew() {
 
     echo "Homebrew installed successfully: $(brew --version)"
 
-    {
-        echo
-        echo "# Homebrew"
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
-        echo ""
-    } >> "$ZSH_CONFIG"
+    cat << EOF >> ~/.zshrc
+
+# Homebrew
+eval "\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+EOF
     echo ""
-    
+
     # shellcheck disable=SC1090
     source "$ZSH_CONFIG"
 }
