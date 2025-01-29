@@ -188,30 +188,34 @@ echo "Updating and upgrading system packages..."
 sudo apt update && sudo apt upgrade -y
 
 echo "Preparing to install the following: "
-while true; do
-    skipping=$(prompt_skip_installs)
+skipping=$(prompt_skip_installs)
 
-    if [ -z "$skipping" ]; then
-        echo "Continuing to install..."
-        break
-    fi
+if [ -z "$skipping" ]; then
+    echo "Installing all components."
+else
+    while true; do
+        if [ "$skipping" = "all" ]; then
+            read -r -p "You chose to skip all installations. Are you sure? (y/n): " confirm
+        else
+            echo "You chose to skip: $skipping"
+            read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
+        fi
 
-    if [ "$skipping" = "all" ]; then
-        read -r -p "You chose to skip all installations. Are you sure? (y/n): " confirm
-    else
-        echo "You chose to skip: $skipping"
-        read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
-    fi
-
-    confirm="$(echo "$confirm" | tr '[:upper:]' '[:lower:]')"
-    if [ "$confirm" = "y" ]; then
-        break
-    elif [ "$confirm" = "n" ]; then
-        echo "Let's try again."
-    else
-        echo "Invalid input. Please answer with 'y' or 'n'."
-    fi
-done
+        confirm="$(echo "$confirm" | tr '[:upper:]' '[:lower:]')"
+        if [ "$confirm" = "y" ]; then
+            break
+        elif [ "$confirm" = "n" ]; then
+            echo "Let's try again."
+            skipping=$(prompt_skip_installs)
+            if [ -z "$skipping" ]; then
+                echo "Continuing to installs..."
+                break
+            fi
+        else
+            echo "Invalid input. Please answer with 'y' or 'n'."
+        fi
+    done
+fi
 
 if [ "$skipping" = "all" ]; then
     SKIP_ALL=true
