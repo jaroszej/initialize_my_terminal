@@ -104,7 +104,7 @@ install_rust() {
 }
 
 install_homebrew() {
-    echo "Installing Homebrew on Ubuntu..."
+    echo "Installing Homebrew..."
 
     if command -v brew >/dev/null 2>&1; then
         echo "Homebrew is already installed: $(brew --version)"
@@ -119,7 +119,7 @@ install_homebrew() {
     }
 
     retry_wrapper "
-        NONINTERACTIVE=1 bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"
+        /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"
     " "echo '!! Error: Homebrew installation failed.'" "$stagename"
 
     if ! command -v brew >/dev/null 2>&1; then
@@ -129,11 +129,14 @@ install_homebrew() {
 
     echo "Homebrew installed successfully: $(brew --version)"
 
-    echo -e "\n# Homebrew" >> "$ZSH_CONFIG"
-    echo "eval \"\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)\"" >> "$ZSH_CONFIG"
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    {
+        echo
+        echo "# Homebrew"
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+        echo ""
+    } >> "$ZSH_CONFIG"
     echo ""
-
+    
     # shellcheck disable=SC1090
     source "$ZSH_CONFIG"
 }
