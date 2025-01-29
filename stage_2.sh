@@ -5,7 +5,7 @@ set -e
 installs_textwall() {
     cat <<EOF
 
-Press 'c' to continue and install all components, or enter numbers to skip specific installations (e.g., '1 3 5').
+Enter numbers to skip specific installations (e.g., '1 3 5').
 
 Options:
 [1] Docker and Docker Compose
@@ -13,7 +13,8 @@ Options:
 [3] Java
 [4] NVM and the latest Node.js LTS version
 [5] Rust
-[0] Skip all installations
+[0] Continue with all installations (skip nothing)
+[6] Skip all installations
 
 EOF
 }
@@ -23,23 +24,25 @@ prompt_skip_installs() {
         installs_textwall
         read -r -p "Enter your choice: " skip_tools
 
-        if [[ "$skip_tools" =~ ^[cC]$ ]]; then
-            echo "c"
-            return
-        fi
-
-        if [[ "$skip_tools" =~ ^[0-5\ ]+$ ]]; then
-            to_skip=()
-            for num in $skip_tools; do
-                case "$num" in
-                    0) echo "all"; return ;;
-                    1|2|3|4|5) to_skip+=("$num") ;;
-                esac
-            done
-            echo "${to_skip[*]}"
-            return
+        if [[ "$skip_tools" =~ ^[0-6\ ]+$ ]]; then
+            if [[ "$skip_tools" =~ \b0\b ]]; then
+                echo "continue"
+                return
+            elif [[ "$skip_tools" =~ \b6\b ]]; then
+                echo "all"
+                return
+            else
+                to_skip=()
+                for num in $skip_tools; do
+                    case "$num" in
+                        1|2|3|4|5) to_skip+=("$num") ;;
+                    esac
+                done
+                echo "${to_skip[*]}"
+                return
+            fi
         else
-            echo "!! Error: Invalid input. Please enter 'c' to install all components or numbers 0-5 to skip specific installations."
+            echo "!! Error: Invalid input. Please enter numbers 0-6 to skip specific installations."
             echo "Please try again."
         fi
     done
@@ -150,7 +153,7 @@ else
     echo "Oh My Zsh is already installed."
 fi
 
-# ensuring curl, git, wget are installed again in case user migrated scripts via hard storage device
+# ensuring curl, git, etc are installed again in case user migrated scripts via hard storage device
 echo "Installing essential tools and utilities..."
 sudo apt install -y \
     build-essential \
@@ -178,50 +181,36 @@ echo "Updating and upgrading system packages..."
 sudo apt update && sudo apt upgrade -y
 echo "apt updated and upgraded"
 
-installs_textwall
 skipping=$(prompt_skip_installs)
 
-if [ "$skipping" = "c" ]; then
-    echo "Installing all components."
+if [ "$skipping" = "continue" ]; then
+    echo "Continuing to installations..."
+elif [ "$skipping" = "all" ]; then
+    echo "Skipping all installations."
 else
-    if [ "$skipping" = "all" ]; then
-        read -r -p "You chose to skip all installations. Are you sure? (y/n): " confirm
-    else
-        echo "You chose to skip: $skipping"
-        read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
-    fi
-
+    echo "You chose to skip: $skipping"
+    read -r -p "Are you sure you want to skip these installations? (y/n): " confirm
     confirm="$(echo "$confirm" | tr '[:upper:]' '[:lower:]')"
     if [ "$confirm" != "y" ]; then
         echo "Let's try again."
         skipping=$(prompt_skip_installs)
-        if [ "$skipping" = "c" ]; then
-            echo "Installing all components."
+        if [ "$skipping" = "continue" ]; then
+            echo "Continuing with all installations (nothing skipped)."
         fi
     fi
 fi
 
-
+# Set skip flags based on user input
 if [ "$skipping" = "all" ]; then
     SKIP_ALL=true
-else
+elif [ "$skipping" != "continue" ]; then
     for val in $skipping; do
         case "$val" in
-            1)
-                SKIP_DOCKER=true
-                ;;
-            2)
-                SKIP_GOLANG=true
-                ;;
-            3)
-                SKIP_JAVA=true
-                ;;
-            4)
-                SKIP_NODE=true
-                ;;
-            5)
-                SKIP_RUST=true
-                ;;
+            1) SKIP_DOCKER=true ;;
+            2) SKIP_GOLANG=true ;;
+            3) SKIP_JAVA=true ;;
+            4) SKIP_NODE=true ;;
+            5) SKIP_RUST=true ;;
         esac
     done
 fi
