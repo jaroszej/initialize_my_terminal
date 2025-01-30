@@ -70,16 +70,19 @@ install_nvm_node() {
         echo "Installing NVM..."
         if [ ! -d "$NVM_DIR" ]; then
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+            export NVM_DIR="$HOME/.config/nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
             refresh_shell
             make_nvm_installed_temp_file
         else
-            echo "NVM is already installed."
+            echo "NVM is already installed: v$(nvm --version)"
             nvm_installed=true
             make_nvm_installed_temp_file
         fi
 
         if [ "$nvm_installed" ] || [ "$(command -v nvm >/dev/null 2>&1)" ]; then
-            echo "NVM is already installed: $(nvm --version)"
+            echo "NVM installed: v$(nvm --version)"
         else
             echo "!! Error: NVM installation failed or is not found in PATH. Please verify your NVM installation by checking for the NVM directory at $NVM_DIR"
             exit 1

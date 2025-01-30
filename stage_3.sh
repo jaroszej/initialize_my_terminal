@@ -100,11 +100,14 @@ if source_helper; then
             cat << EOF >> ~/.zshrc
 
 # Load Znap
-
 [[ -r $ZNAP_DIR/znap.zsh ]] && source $ZNAP_DIR/znap.zsh
 
 # Load zsh-autocomplete
 source $ZSH_AUTOCOMPLETE_DIR/zsh-autocomplete.plugin.zsh
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Plugins
 znap source zsh-users/zsh-completions
