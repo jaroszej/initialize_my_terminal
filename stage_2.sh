@@ -101,17 +101,21 @@ install_nvm_node() {
 }
 
 install_rust() {
-    echo "Installing Rust..."    
-    retry_wrapper "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "handle_rust_error"
-
     RUST_ENV_FILE="$HOME/.cargo/env"
-    if [ -f "$RUST_ENV_FILE" ]; then
-        # shellcheck disable=SC1091
-        source "$RUST_ENV_FILE"
-        echo "Rust installed successfully: $(rustc --version)"
+    if [ ! -f "$RUST_ENV_FILE" ]; then
+        echo "Installing Rust..."    
+        retry_wrapper "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "handle_rust_error"
+        
+        if [ -f "$RUST_ENV_FILE" ]; then
+            # shellcheck disable=SC1091
+            source "$RUST_ENV_FILE"
+            echo "Rust installed successfully: $(rustc --version)"
+        else
+            echo "NOTE: $RUST_ENV_FILE not found after installation."
+            echo "Try restarting your shell or manually running: source ~/.cargo/env"
+        fi
     else
-        echo "NOTE: Rust installed, but $RUST_ENV_FILE not found."
-        echo "Try restarting your shell or manually running: source ~/.cargo/env"
+        echo "Rust already installed."
     fi
 
     echo ""

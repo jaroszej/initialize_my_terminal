@@ -48,9 +48,11 @@ check_dependencies() {
     else
         echo "All dependencies are already installed."
     fi
-
-    echo "setting default git branch to main"
-    git config --global init.defaultBranch main
+    
+    if [ "$(git config --global --get init.defaultBranch)" != "main" ]; then
+        echo "Setting default git branch to main"
+        git config --global init.defaultBranch main
+    fi
 }
 
 install_zsh() {
