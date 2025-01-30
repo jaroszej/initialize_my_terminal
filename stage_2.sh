@@ -68,17 +68,16 @@ install_java() {
 install_nvm_node() {
     echo "Installing NVM..."
     if [ ! -d "$HOME/.nvm" ]; then
-        retry_wrapper "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash" "handle_nvm_error"
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        refresh_shell
     else
         echo "NVM is already installed."
     fi
 
-    export NVM_DIR="$HOME/.nvm"
-    if [ -s "$NVM_DIR/nvm.sh" ]; then
-        # shellcheck disable=SC1091
-        . "$NVM_DIR/nvm.sh"
+    if [ "$(command -v nvm >/dev/null 2>&1)" ]; then
+        echo "NVM is already installed: $(nvm --version)"
     else
-        echo "!! Error: NVM script not found. Please verify your NVM installation."
+        echo "!! Error: NVM installation failed or is not found in PATH. Please verify your NVM installation by checking for the NVM directory at $NVM_DIR"
         exit 1
     fi
 
