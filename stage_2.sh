@@ -70,9 +70,9 @@ install_nvm_node() {
         echo "Installing NVM..."
         if [ ! -d "$NVM_DIR" ]; then
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-            export NVM_DIR="$HOME/.config/nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             source "$zsh_config"
             make_nvm_installed_temp_file
         else
@@ -80,6 +80,9 @@ install_nvm_node() {
             nvm_installed=true
             make_nvm_installed_temp_file
         fi
+
+        # Explicitly source nvm again to ensure it's available
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
         if [ "$nvm_installed" ] || [ "$(command -v nvm >/dev/null 2>&1)" ]; then
             echo "NVM installed: v$(nvm --version)"
