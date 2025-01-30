@@ -66,22 +66,26 @@ install_java() {
 
 # Install NVM, Node.js, and pnpm
 install_nvm_node() {
-    echo "Installing NVM..."
-    if [ ! -d "$NVM_DIR" ]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-        refresh_shell
-        make_nvm_installed_temp_file
-    else
-        echo "NVM is already installed."
-        nvm_installed=true
-        make_nvm_installed_temp_file
-    fi
+    if ! check_nvm_installed_temp_file; then
+        echo "Installing NVM..."
+        if [ ! -d "$NVM_DIR" ]; then
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+            refresh_shell
+            make_nvm_installed_temp_file
+        else
+            echo "NVM is already installed."
+            nvm_installed=true
+            make_nvm_installed_temp_file
+        fi
 
-    if [ "$nvm_installed" ] || [ "$(command -v nvm >/dev/null 2>&1)" ]; then
-        echo "NVM is already installed: $(nvm --version)"
+        if [ "$nvm_installed" ] || [ "$(command -v nvm >/dev/null 2>&1)" ]; then
+            echo "NVM is already installed: $(nvm --version)"
+        else
+            echo "!! Error: NVM installation failed or is not found in PATH. Please verify your NVM installation by checking for the NVM directory at $NVM_DIR"
+            exit 1
+        fi
     else
-        echo "!! Error: NVM installation failed or is not found in PATH. Please verify your NVM installation by checking for the NVM directory at $NVM_DIR"
-        exit 1
+        echo "NVM is installed."
     fi
 
     echo "Installing the latest LTS version of Node.js..."
