@@ -73,7 +73,7 @@ install_nvm_node() {
             export NVM_DIR="$HOME/.config/nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-            refresh_shell
+            source "$zsh_config"
             make_nvm_installed_temp_file
         else
             echo "NVM is already installed: v$(nvm --version)"
@@ -89,24 +89,23 @@ install_nvm_node() {
         fi
     else
         echo "NVM is installed."
-    fi
+        echo "Installing the latest LTS version of Node.js..."
+        if retry_wrapper "nvm install --lts" "handle_node_error"; then
+            echo "Node.js LTS installed successfully: $(node -v)"
+        else
+            echo "!! Error: Failed to install Node.js LTS."
+            exit 1
+        fi
 
-    echo "Installing the latest LTS version of Node.js..."
-    if retry_wrapper "nvm install --lts" "handle_node_error"; then
-        echo "Node.js LTS installed successfully: $(node -v)"
-    else
-        echo "!! Error: Failed to install Node.js LTS."
-        exit 1
+        echo "Installing pnpm..."
+        if retry_wrapper "npm install -g pnpm" "handle_pnpm_error"; then
+            echo "pnpm installed successfully: $(pnpm -v)"
+        else
+            echo "!! Error: Failed to install pnpm."
+            exit 1
+        fi
+        echo ""
     fi
-
-    echo "Installing pnpm..."
-    if retry_wrapper "npm install -g pnpm" "handle_pnpm_error"; then
-        echo "pnpm installed successfully: $(pnpm -v)"
-    else
-        echo "!! Error: Failed to install pnpm."
-        exit 1
-    fi
-    echo ""
 }
 
 install_rust() {
