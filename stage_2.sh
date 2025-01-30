@@ -271,6 +271,15 @@ if source_helper; then
                 "echo '!! Error: Failed to install Homebrew cask $cask.'; exit 1;"
         done
 
+        if [ "$WSL_DISTRO_NAME" ]; then
+            echo "Detected WSL distro: $WSL_DISTRO_NAME. Configuring Wayland socket environment variables..."
+            try_catch \
+                echo 'export WAYLAND_DISPLAY=wayland-0' >> ~/.zshrc
+                echo 'export XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir' >> ~/.zshrc
+                # shellcheck disable=SC1090
+                source "$ZSH_CONFIG"
+        fi
+
         # Directory setup
         PROJECTS_DIR="$HOME/projects"
         TOOLS_DIR="$HOME/tools"
@@ -298,7 +307,7 @@ if source_helper; then
             REPO_DIR="$PROJECTS_DIR/$repo"
             if [ ! -d "$REPO_DIR" ]; then
                 echo "Cloning $repo into $REPO_DIR..."
-                git clone "https://github.com/$GITHUB_USERNAME/$repo.git" "$REPO_DIR"
+                git clone "git@github.com:$GITHUB_USERNAME/$repo.git" "$REPO_DIR"
             else
                 echo "Repository $repo already exists in $REPO_DIR."
             fi
