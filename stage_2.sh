@@ -69,10 +69,10 @@ install_nvm_node() {
     if ! check_nvm_installed_temp_file; then
         echo "Installing NVM..."
         if [ ! -d "$NVM_DIR" ]; then
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash;
+            export NVM_DIR="$HOME/.nvm";
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion";
             source "$zsh_config"
             make_nvm_installed_temp_file
         else
@@ -258,7 +258,7 @@ if source_helper; then
         install_java
         install_golang
         install_docker
-        install_nvm_node
+        # install_nvm_node 
         install_rust
 
         install_homebrew
