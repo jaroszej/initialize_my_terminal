@@ -167,12 +167,12 @@ warn_enable_scroll() {
                 echo ""
                 echo "If you start ${installed[0]} you will need to execute './start.sh' again to restart the script."
                 echo ""
-                echo "Press 'Enter' to start ${installed[0]}"
-                echo "Enter 'C' to continue without ${installed[0]}"
+                echo "Press 'S' to start ${installed[0]}"
+                echo "Enter 'C' to continue without starting a ${installed[0]} session"
                 echo "Enter 'Q' to quit and close the script"
                 read -r response
                 case "$response" in
-                    [Cc]) echo "Continuing without ${installed[0]}."; return ;;
+                    [Cc]) echo "Continuing..."; return ;;
                     [Qq]) echo "Exiting initialize_my_terminal..."; exit 0 ;;
                     *) 
                         make_scroll_temp_file
@@ -187,7 +187,7 @@ warn_enable_scroll() {
                 echo ""
                 echo "If you start ${installed[0]} or ${installed[1]} you will need to execute './start.sh' again to restart the script."
                 echo ""
-                echo "Press 'Enter' to continue without starting ${installed[0]} or ${installed[1]}"
+                echo "Press 'Enter' to continue without starting a ${installed[0]} or ${installed[1]} session"
                 echo "Enter 'T' to start ${installed[0]}"
                 echo "Enter 'S' to start ${installed[1]}"
                 echo "Enter 'Q' to quit and close the script"
@@ -197,7 +197,7 @@ warn_enable_scroll() {
                     t) make_scroll_temp_file; enter_scroll "${installed[0]}"; return ;;
                     s) make_scroll_temp_file; enter_scroll "${installed[1]}"; return ;;
                     q) echo "Exiting initialize_my_terminal..."; exit 0 ;;
-                    "") echo "Continuing without using tmux or screen."; return ;;
+                    "") echo "Continuing..."; return ;;
                     *) echo "Invalid input. Please enter 'T', 'S', or 'Q' or press Enter to continue." ;;
                 esac
             done
