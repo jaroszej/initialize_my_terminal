@@ -93,6 +93,8 @@ if source_helper; then
         done
 
         clear_scroll_temp_file
+        clear_nvm_installed_temp_file
+        clear_zsh_setup_temp_file
         clear_stage_temp_files
 
         echo ""

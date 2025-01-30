@@ -4,6 +4,7 @@ temp_dir="/tmp/initialize_my_terminal"
 after_install="./after_install"
 mkdir -p "$temp_dir" "$after_install"
 scroll_temp_file="$temp_dir/scroll_avail.temp"
+nvm_installed_temp_file="$temp_dir/nvm_installed.temp"
 zsh_setup_temp_file="$temp_dir/zsh_setup.temp"
 export OPTIONAL_PKG_LOG="$after_install/optional_packages_failed.log"
 export zsh_config="$HOME/.zshrc"
@@ -251,6 +252,10 @@ check_scroll_temp_file() {
     [ -f "$scroll_temp_file" ]
 }
 
+check_nvm_installed_temp_file() {
+    [ -f "$nvm_installed_temp_file" ]
+}
+
 check_zsh_setup_temp_file() {
     [ -f "$zsh_setup_temp_file" ]
 }
@@ -261,6 +266,15 @@ make_scroll_temp_file() {
     else
         touch "$scroll_temp_file"
         echo "Scroll session recorded in $scroll_temp_file."
+    fi
+}
+
+make_nvm_installed_temp_file() {
+    if check_nvm_installed_temp_file; then
+        echo "NVM temp file already exists."
+    else
+        touch "$nvm_installed_temp_file"
+        echo "NVM session recorded in $nvm_installed_temp_file."
     fi
 }
 
@@ -302,6 +316,14 @@ clear_stage_temp_files() {
             echo "Removed stage $stage temp file."
         fi
     done
+}
+
+clear_nvm_installed_temp_file() {
+    if check_nvm_installed_temp_file; then
+        rm "$nvm_installed_temp_file"
+        echo ""
+        echo "NVM session flag removed from $nvm_installed_temp_file."
+    fi
 }
 
 clear_zsh_setup_temp_file() {

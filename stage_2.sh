@@ -67,12 +67,14 @@ install_java() {
 # Install NVM, Node.js, and pnpm
 install_nvm_node() {
     echo "Installing NVM..."
-    if [ ! -d "$NVM_DIR/.nvm" ]; then
+    if [ ! -d "$NVM_DIR" ]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
         refresh_shell
+        make_nvm_installed_temp_file
     else
         echo "NVM is already installed."
         nvm_installed=true
+        make_nvm_installed_temp_file
     fi
 
     if [ "$nvm_installed" ] || [ "$(command -v nvm >/dev/null 2>&1)" ]; then
