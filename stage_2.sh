@@ -189,6 +189,7 @@ if source_helper; then
         fi
 
         export ZSH_CONFIG="$HOME/.zshrc"
+        echo "Verifying env var ZSH_CONFIG: '$ZSH_CONFIG'"
 
         try_catch "make_zsh_setup_temp_file" "handle_zsh_config_error"
 

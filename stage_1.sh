@@ -158,6 +158,7 @@ if source_helper; then
 
         if [[ "$zsh_path" != "$SHELL" ]]; then
             export SHELL="$zsh_path"
+            echo "Verifying env var SHELL: '$SHELL'"
         fi
 
         current_shell=$(getent passwd "$USER" | cut -d: -f7)

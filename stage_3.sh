@@ -49,9 +49,12 @@ retry_wrapper() {
     fi
 }
 
+echo "_"
 if source_helper; then
+    echo "__"
     if source_files; then
         # Main logic
+        echo "___"
         echo "Checking if Zsh is installed..."
         if command -v zsh >/dev/null 2>&1; then
             echo "Zsh found: $(zsh --version)"
@@ -72,10 +75,11 @@ if source_helper; then
         if [ ! -d "$ZSH_REPOS_DIR" ]; then
             mkdir -p "$ZSH_REPOS_DIR"
         fi
+        export ZSH_REPOS_DIR
+        echo "Verifying env var ZSH_REPOS_DIR: '$ZSH_REPOS_DIR'"
 
         echo "Installing Znap..."
         ZNAP_DIR="$ZSH_REPOS_DIR/znap"
-        export ZNAP_DIR
         if [ ! -d "$ZNAP_DIR" ]; then
             retry_wrapper "git clone --depth 1 https://github.com/marlonrichert/zsh-snap.git \"$ZNAP_DIR\"" \
                 "echo '!! Error: Failed to install Znap.'"
@@ -83,6 +87,8 @@ if source_helper; then
         else
             echo "Znap is already installed."
         fi
+        export ZNAP_DIR
+        echo "Verifying env var ZNAP_DIR: '$ZNAP_DIR'"
 
         echo "Installing zsh-autocomplete..."
         ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
@@ -93,6 +99,8 @@ if source_helper; then
         else
             echo "zsh-autocomplete is already installed."
         fi
+        export ZSH_AUTOCOMPLETE_DIR
+        echo "Verifying env var ZSH_AUTOCOMPLETE_DIR: '$ZSH_AUTOCOMPLETE_DIR'"
 
         echo "Configuring ~/.zshrc for Znap, zsh-autocomplete, and custom user functions..."
 
@@ -492,7 +500,7 @@ EOF
             echo "Znap configuration already exists in ~/.zshrc."
         fi
 
-        echo "Adding skip_global_compini=1 to ~/.zshenv for zsh-autocomplete..."
+        echo "Verifying skip_global_compini=1 to ~/.zshenv for zsh-autocomplete..."
         if ! grep -q "skip_global_compinit=1" ~/.zshenv; then
             echo "skip_global_compinit=1" >> ~/.zshenv
             echo "skip_global_compinit=1 added to ~/.zshenv."
@@ -513,10 +521,13 @@ EOF
         exit 0
 
     else
+        echo "___"
         wrapper_frame "$stagename" "!! Error: Failed to source needed files."
         exit 1
     fi
 else
+    echo "__"
     wrapper_frame "$stagename" "!! Error: Failed to source helper file."
     exit 1
 fi
+echo "_"
