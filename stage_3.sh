@@ -71,15 +71,14 @@ if source_helper; then
             exit 1
         fi
 
-        ZSH_REPOS_DIR="$HOME/zsh_repos"
+        export ZSH_REPOS_DIR="$HOME/zsh_repos"
         if [ ! -d "$ZSH_REPOS_DIR" ]; then
             mkdir -p "$ZSH_REPOS_DIR"
         fi
-        export ZSH_REPOS_DIR
         echo "Verifying env var ZSH_REPOS_DIR: '$ZSH_REPOS_DIR'"
 
         echo "Installing Znap..."
-        ZNAP_DIR="$ZSH_REPOS_DIR/znap"
+        export ZNAP_DIR="$ZSH_REPOS_DIR/znap"
         if [ ! -d "$ZNAP_DIR" ]; then
             retry_wrapper "git clone --depth 1 https://github.com/marlonrichert/zsh-snap.git \"$ZNAP_DIR\"" \
                 "echo '!! Error: Failed to install Znap.'"
@@ -87,11 +86,10 @@ if source_helper; then
         else
             echo "Znap is already installed."
         fi
-        export ZNAP_DIR
         echo "Verifying env var ZNAP_DIR: '$ZNAP_DIR'"
 
         echo "Installing zsh-autocomplete..."
-        ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
+        export ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
         if [ ! -d "$ZSH_AUTOCOMPLETE_DIR" ]; then
             retry_wrapper "git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git \"$ZSH_AUTOCOMPLETE_DIR\"" \
                 "echo '!! Error: Failed to install zsh-autocomplete.'"
@@ -99,7 +97,6 @@ if source_helper; then
         else
             echo "zsh-autocomplete is already installed."
         fi
-        export ZSH_AUTOCOMPLETE_DIR
         echo "Verifying env var ZSH_AUTOCOMPLETE_DIR: '$ZSH_AUTOCOMPLETE_DIR'"
 
         echo "Configuring ~/.zshrc for Znap, zsh-autocomplete, and custom user functions..."
@@ -108,9 +105,10 @@ if source_helper; then
             cat << 'EOF' >> ~/.zshrc
 
 # Load Znap
+export ZSH_REPOS_DIR="$HOME/zsh_repos"
+export ZNAP_DIR="$ZSH_REPOS_DIR/znap"
+export ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
 [[ -r $ZNAP_DIR/znap.zsh ]] && source $ZNAP_DIR/znap.zsh
-
-# Load zsh-autocomplete
 source $ZSH_AUTOCOMPLETE_DIR/zsh-autocomplete.plugin.zsh
 
 export NVM_DIR="$HOME/.config/nvm"
