@@ -22,6 +22,7 @@ run_stage() {
     local stage_number=$1
     local retry=$2
     local autoyes=$3
+    echo "run_stage()"
 
     if [ ! -f "$stage_script" ]; then
         wrapper_frame "$stagename" "!! Error: Stage $stage_number script ($stage_script) not found."
@@ -42,6 +43,8 @@ run_stage() {
         echo "===================================================================================="
         echo "Exiting initialize_my_terminal. Please resolve the issue and re-run."
         exit 1
+    else
+        echo "No args found. Continuing..."
     fi
 }
 
@@ -101,7 +104,7 @@ if source_helper; then
         wrapper_frame "$stagename" " Stage 3/3"
         echo ""
         echo "OK: All stages completed successfully! Your environment is now set up."
-        echo "NOTE: You may need to restart your terminal or run 'source ~/.zshrc' to apply changes."
+        echo "Restart your terminal."
         echo "===================================================================================="
         echo ""
 

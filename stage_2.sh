@@ -251,9 +251,17 @@ if source_helper; then
         done
 
         echo "Updating and upgrading system packages..."
-        retry_wrapper "sudo apt update && sudo apt upgrade -y" \
-            "echo '!! Error: Failed to upgrade packages.'"
-        echo "apt updated and upgraded"
+        aptuu=$(retry_wrapper "sudo apt update && sudo apt upgrade -y" \
+            "echo '!! Error: Failed to upgrade packages.'")
+        if [ "$aptuu" -eq 0 ]; then
+            echo "apt updated and upgraded"
+        fi
+
+        aupa=$(retry_wrapper "sudo apt autoremove -y" \
+            "echo '!! Error: Failed to autoremove packages.'")
+        if [ "$aupa" -eq 0 ]; then
+            echo "cleaned up apt packages that are 'no longer required'"
+        fi
 
         install_java
         install_golang
@@ -263,13 +271,13 @@ if source_helper; then
 
         install_homebrew
 
-        echo "Installing Homebrew sourced package(s)..."
+        # echo "Installing Homebrew sourced package(s)..."
         # homebrew_casks=("ngrok" "croc")
 
-        for cask in "${homebrew_casks[@]}"; do
-            retry_wrapper "brew install --cask $cask" \
-                "echo '!! Error: Failed to install Homebrew cask $cask.'; exit 1;"
-        done
+        # for cask in "${homebrew_casks[@]}"; do
+        #     retry_wrapper "brew install --cask $cask" \
+        #         "echo '!! Error: Failed to install Homebrew cask $cask.'; exit 1;"
+        # done
 
         if [ "$WSL_DISTRO_NAME" ]; then
             echo "Detected WSL distro: $WSL_DISTRO_NAME. Configuring Wayland socket environment variables..."
@@ -279,19 +287,20 @@ if source_helper; then
 
             if ! grep -q "$wayland_display" "$ZSH_CONFIG"; then
                 echo "$wayland_display" >> "$ZSH_CONFIG"
+            else
+                echo "wayland display set up in $ZSH_CONFIG"
             fi
 
             if ! grep -q "$runtime_dir" "$ZSH_CONFIG"; then
                 echo "$runtime_dir" >> "$ZSH_CONFIG"
-            fi
-            source "$ZSH_CONFIG" || { echo '!! Error: Failed to configure Wayland socket environment variables.'; exit 1; }
-            
+            else
+                echo "runtime dir set up in $ZSH_CONFIG"
+            fi            
             if grep -q '^ZSH_THEME=' ~/.zshrc; then
                 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="jonathan"/' ~/.zshrc
             else
                 echo 'ZSH_THEME="jonathan"' >> ~/.zshrc
             fi
-            source "$ZSH_CONFIG" || { echo "Warning: Could not set ZSH_THEME to 'jonathan'"; }
         fi
 
         # Directory setup

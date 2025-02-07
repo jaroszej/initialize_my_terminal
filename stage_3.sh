@@ -95,6 +95,7 @@ if source_helper; then
         fi
 
         echo "Configuring ~/.zshrc for Znap, zsh-autocomplete, and custom user functions..."
+
         if ! grep -q "znap.zsh" ~/.zshrc; then
             cat << 'EOF' >> ~/.zshrc
 
@@ -387,15 +388,31 @@ EOG
 
 edit_config() {
     fn_tag "edit_config"
+    # reorder if blocks to change editor priority
+    nvim=$(command -v nvim >/dev/null 2>&1)
+    code=$(command -v code >/dev/null 2>&1)
+    subl=$(command -v subl >/dev/null 2>&1)
+    nano=$(command -v nano >/dev/null 2>&1)
+
+    if command -v nvim >/dev/null 2>&1; then
+        nvim ~/.zshrc
+        return 0
+    fi
     if command -v code >/dev/null 2>&1; then
         code ~/.zshrc
-    elif command -v subl >/dev/null 2>&1; then
-        subl ~/.zshrc
-    elif command -v nvim >/dev/null 2>&1; then
-        nvim ~/.zshrc
-    else command -v nano >/dev/null 2>&1; then
-        nano ~/.zshrc
+        return 0
     fi
+    if command -v subl >/dev/null 2>&1; then
+        subl ~/.zshrc
+        return 0
+    fi
+    if command -v nano >/dev/null 2>&1; then
+        nano ~/.zshrc
+        return 0
+    fi
+
+    echo -e "\${RED}No text editor found. Please install one and try again.\${RESET}"
+    return 1
 }
 
 backupZshConfig() {
