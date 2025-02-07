@@ -171,18 +171,9 @@ if source_helper; then
             echo "Zsh is the default shell."
         fi
 
-        # Automate Zsh initial configuration
-        echo "Automating Zsh initial configuration..."
-        if [ ! -f "$HOME/.zshrc" ]; then
-            echo "2" | zsh || {
-                echo "!! Error: Failed to configure Zsh. Please configure it manually by running Zsh."
-                exit 1
-            }
-        fi
-
         # Switch to Zsh and execute the second script
         echo ""
-        echo "Stage 1 setup is complete. Switching to Zsh and continuing setup in stage_2.sh..."
+        echo "Stage 1 setup is complete. Complete the initial Zsh configuration by selecting option (2)"
 
         exit 0
                 
