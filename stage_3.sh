@@ -105,10 +105,9 @@ if source_helper; then
             cat << 'EOF' >> ~/.zshrc
 
 # Load Znap
-export ZSH_REPOS_DIR="$HOME/zsh_repos"
-export ZNAP_DIR="$ZSH_REPOS_DIR/znap"
-export ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
 [[ -r $ZNAP_DIR/znap.zsh ]] && source $ZNAP_DIR/znap.zsh
+
+# Load zsh-autocomplete
 source $ZSH_AUTOCOMPLETE_DIR/zsh-autocomplete.plugin.zsh
 
 export NVM_DIR="$HOME/.config/nvm"
