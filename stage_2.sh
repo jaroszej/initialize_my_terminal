@@ -273,11 +273,25 @@ if source_helper; then
 
         if [ "$WSL_DISTRO_NAME" ]; then
             echo "Detected WSL distro: $WSL_DISTRO_NAME. Configuring Wayland socket environment variables..."
-            try_catch \
-                echo 'export WAYLAND_DISPLAY=wayland-0' >> ~/.zshrc
-                echo 'export XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir' >> ~/.zshrc
-                # shellcheck disable=SC1090
-                source "$ZSH_CONFIG"
+
+            wayland_display='export WAYLAND_DISPLAY=wayland-0'
+            runtime_dir='export XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir'
+
+            if ! grep -q "$wayland_display" "$ZSH_CONFIG"; then
+                echo "$wayland_display" >> "$ZSH_CONFIG"
+            fi
+
+            if ! grep -q "$runtime_dir" "$ZSH_CONFIG"; then
+                echo "$runtime_dir" >> "$ZSH_CONFIG"
+            fi
+            source "$ZSH_CONFIG" || { echo '!! Error: Failed to configure Wayland socket environment variables.'; exit 1; }
+            
+            if grep -q '^ZSH_THEME=' ~/.zshrc; then
+                sed -i 's/^ZSH_THEME=.*/ZSH_THEME="jonathan"/' ~/.zshrc
+            else
+                echo 'ZSH_THEME="jonathan"' >> ~/.zshrc
+            fi
+            source "$ZSH_CONFIG" || { echo "Warning: Could not set ZSH_THEME to 'jonathan'"; }
         fi
 
         # Directory setup
