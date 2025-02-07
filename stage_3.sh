@@ -76,9 +76,10 @@ if source_helper; then
             mkdir -p "$ZSH_REPOS_DIR"
         fi
         echo "Verifying env var ZSH_REPOS_DIR: '$ZSH_REPOS_DIR'"
+        add_env_var "ZSH_REPOS_DIR" $ZSH_REPOS_DIR
 
         echo "Installing Znap..."
-        export ZNAP_DIR="$ZSH_REPOS_DIR/znap"
+        ZNAP_DIR="$ZSH_REPOS_DIR/znap"
         if [ ! -d "$ZNAP_DIR" ]; then
             retry_wrapper "git clone --depth 1 https://github.com/marlonrichert/zsh-snap.git \"$ZNAP_DIR\"" \
                 "echo '!! Error: Failed to install Znap.'"
@@ -87,9 +88,10 @@ if source_helper; then
             echo "Znap is already installed."
         fi
         echo "Verifying env var ZNAP_DIR: '$ZNAP_DIR'"
+        add_env_var "ZNAP_DIR" $ZNAP_DIR
 
         echo "Installing zsh-autocomplete..."
-        export ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
+        ZSH_AUTOCOMPLETE_DIR="$ZSH_REPOS_DIR/marlonrichert/zsh-autocomplete"
         if [ ! -d "$ZSH_AUTOCOMPLETE_DIR" ]; then
             retry_wrapper "git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git \"$ZSH_AUTOCOMPLETE_DIR\"" \
                 "echo '!! Error: Failed to install zsh-autocomplete.'"
@@ -98,9 +100,8 @@ if source_helper; then
             echo "zsh-autocomplete is already installed."
         fi
         echo "Verifying env var ZSH_AUTOCOMPLETE_DIR: '$ZSH_AUTOCOMPLETE_DIR'"
-
-        echo "Configuring ~/.zshrc for Znap, zsh-autocomplete, and custom user functions..."
-
+        add_env_var "ZSH_AUTOCOMPLETE_DIR" $ZSH_AUTOCOMPLETE_DIR
+        
         if ! grep -q "znap.zsh" ~/.zshrc; then
             cat << 'EOF' >> ~/.zshrc
 

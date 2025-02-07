@@ -339,3 +339,21 @@ wrapper_frame() {
     echo "$2"
     echo "===================================================================================="
 }
+
+add_env_var() {
+    local var_name="$1"
+    local var_value="$2"
+    local to_add="export $var_name=\"$var_value\""
+    local check="^export $var_name="
+
+    if ! grep "$check" ~/.zshenv; then
+        echo "$to_add" >> ~/.zshenv
+    fi
+
+    if ! grep "$check" ~/.zshenv; then
+        echo "!! Error: Failed to add $var_name to ~/.zshenv."
+        exit 1     
+    fi
+
+    echo "Added $var_name to ~/.zshenv"
+}

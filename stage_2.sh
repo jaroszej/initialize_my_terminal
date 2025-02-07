@@ -34,7 +34,6 @@ retry_wrapper() {
     fi
 }
 
-
 install_docker() {
     echo "Installing Docker and Docker Compose..."
     docker_packages=("docker.io" "docker-compose")
@@ -190,6 +189,7 @@ if source_helper; then
 
         export ZSH_CONFIG="$HOME/.zshrc"
         echo "Verifying env var ZSH_CONFIG: '$ZSH_CONFIG'"
+        add_env_var "ZSH_CONFIG" $ZSH_CONFIG
 
         try_catch "make_zsh_setup_temp_file" "handle_zsh_config_error"
 
@@ -284,29 +284,16 @@ if source_helper; then
             echo "Detected WSL distro: $WSL_DISTRO_NAME. Configuring Wayland socket environment variables..."
 
             wayland_display='export WAYLAND_DISPLAY=wayland-0'
+            add_env_var "WAYLAND_DISPLAY" $wayland_display
             runtime_dir='export XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir'
-
-            if ! grep -q "$wayland_display" "$ZSH_CONFIG"; then
-                echo "$wayland_display" >> "$ZSH_CONFIG"
-            else
-                echo "wayland display set up in $ZSH_CONFIG"
-            fi
-
-            if ! grep -q "$runtime_dir" "$ZSH_CONFIG"; then
-                echo "$runtime_dir" >> "$ZSH_CONFIG"
-            else
-                echo "runtime dir set up in $ZSH_CONFIG"
-            fi            
-            if grep -q '^ZSH_THEME=' ~/.zshrc; then
-                sed -i 's/^ZSH_THEME=.*/ZSH_THEME="jonathan"/' ~/.zshrc
-            else
-                echo 'ZSH_THEME="jonathan"' >> ~/.zshrc
-            fi
+            add_env_var "XDG_RUNTIME_DIR" $runtime_dir
         fi
 
         # Directory setup
         PROJECTS_DIR="$HOME/projects"
+        add_env_var "PROJECTS_DIR" $PROJECTS_DIR
         TOOLS_DIR="$HOME/tools"
+        add_env_var "TOOLS_DIR" $TOOLS_DIR
 
         for dir in "$PROJECTS_DIR" "$TOOLS_DIR"; do
             if [ ! -d "$dir" ]; then
@@ -325,8 +312,6 @@ if source_helper; then
             "roszeSoftUtilitySuite"
         )
 
-        # TODO: user prompted for username and pass here- investigate
-
         for repo in "${PROJECT_REPOS[@]}"; do
             REPO_DIR="$PROJECTS_DIR/$repo"
             if [ ! -d "$REPO_DIR" ]; then
@@ -336,6 +321,13 @@ if source_helper; then
                 echo "Repository $repo already exists in $REPO_DIR."
             fi
         done
+        
+        # oh my zsh theme
+        if grep -q '^ZSH_THEME=' ~/.zshrc; then
+            sed -i 's/^ZSH_THEME=.*/ZSH_THEME="jonathan"/' ~/.zshrc
+        else
+            echo 'ZSH_THEME="jonathan"' >> ~/.zshrc
+        fi
 
         echo ""
         echo "Stage 2 setup is complete. Configuring Zsh..."

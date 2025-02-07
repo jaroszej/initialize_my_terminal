@@ -154,11 +154,13 @@ if source_helper; then
             done
         else
             echo "Using Zsh path: $zsh_path"
+            add_env_var "ZSH_PATH" $zsh_path
         fi
 
         if [[ "$zsh_path" != "$SHELL" ]]; then
             export SHELL="$zsh_path"
             echo "Verifying env var SHELL: '$SHELL'"
+            add_env_var "SHELL" $SHELL
         fi
 
         current_shell=$(getent passwd "$USER" | cut -d: -f7)
